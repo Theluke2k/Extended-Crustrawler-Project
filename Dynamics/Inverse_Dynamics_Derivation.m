@@ -85,7 +85,7 @@ T56 = [cos(t6) -sin(t6) 0 0;
        0 0 1 d6;
        0 0 0 1];
 
-% Define transformation from base frame to each link
+% Compute transformation from base frame to each link
 T02 = T01*T12;
 T03 = T01*T12*T23;
 T04 = T01*T12*T23*T34;
