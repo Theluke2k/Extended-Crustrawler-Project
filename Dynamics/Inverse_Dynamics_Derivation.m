@@ -133,7 +133,7 @@ z = [z0, z1, z2, z3, z4, z5];
 % Compute all Jacobians and insert in one big matrix
 for j=1:6
     for i=1:6
-        if(i>j)
+        if(i>j) % Zero padding
             J(1:3,i+(6*(j-1))) = 0;
             J(4:6,i+(6*(j-1))) = 0;
         else
@@ -149,6 +149,44 @@ B = 0;
 for i=1:6
     B = B + simplify(m(i)*J(1:3,(6*(i-1)+1):(6*i))'*J(1:3,(6*(i-1)+1):(6*i)) + J(4:6,(6*(i-1)+1):(6*i))'*T0n(1:3,(4*(i-1)+1):(4*(i-1)+3))*(10^(-3)*Icn(1:3,(3*(i-1)+1):(3*i))*T0n(1:3,(4*(i-1)+1):(4*(i-1)+3))')*J(4:6,(6*(i-1)+1):(6*i)));
 end
+
+% Create Matlab function to compute the matrix
+B11 = matlabFunction(simplify(B(1,1)));
+B12 = matlabFunction(simplify(B(1,2)));
+B13 = matlabFunction(simplify(B(1,3)));
+B14 = matlabFunction(simplify(B(1,4)));
+B15 = matlabFunction(simplify(B(1,5)));
+B16 = matlabFunction(simplify(B(1,6)));
+B21 = matlabFunction(simplify(B(2,1)));
+B22 = matlabFunction(simplify(B(2,2)));
+B23 = matlabFunction(simplify(B(2,3)));
+B24 = matlabFunction(simplify(B(2,4)));
+B25 = matlabFunction(simplify(B(2,5)));
+B26 = matlabFunction(simplify(B(2,6)));
+B31 = matlabFunction(simplify(B(3,1)));
+B32 = matlabFunction(simplify(B(3,2)));
+B33 = matlabFunction(simplify(B(3,3)));
+B34 = matlabFunction(simplify(B(3,4)));
+B35 = matlabFunction(simplify(B(3,5)));
+B36 = matlabFunction(simplify(B(3,6)));
+B41 = matlabFunction(simplify(B(4,1)));
+B42 = matlabFunction(simplify(B(4,2)));
+B43 = matlabFunction(simplify(B(4,3)));
+B44 = matlabFunction(simplify(B(4,4)));
+B45 = matlabFunction(simplify(B(4,5)));
+B46 = matlabFunction(simplify(B(4,6)));
+B51 = matlabFunction(simplify(B(5,1)));
+B52 = matlabFunction(simplify(B(5,2)));
+B53 = matlabFunction(simplify(B(5,3)));
+B54 = matlabFunction(simplify(B(5,4)));
+B55 = matlabFunction(simplify(B(5,5)));
+B56 = matlabFunction(simplify(B(5,6)));
+B61 = matlabFunction(simplify(B(6,1)));
+B62 = matlabFunction(simplify(B(6,2)));
+B63 = matlabFunction(simplify(B(6,3)));
+B64 = matlabFunction(simplify(B(6,4)));
+B65 = matlabFunction(simplify(B(6,5)));
+B66 = matlabFunction(simplify(B(6,6)));
 
 % Calculate total kinetic energy of manipulator using inertia matrix
 T = 0.5*qd'*B*qd;
