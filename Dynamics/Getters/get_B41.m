@@ -1,0 +1,4 @@
+function res = get_B41(t1,t2,t3,t4,t5,t6)
+    res = cos(t2).*cos(t3).*(-2.25271004432e-3)+sin(t2).*sin(t3).*2.25271004432e-3+cos(t2).*cos(t3).*cos(t5).^2.*1.84871004432e-3-cos(t2).*cos(t3).*cos(t6).^2.*5.8e-5-cos(t5).^2.*sin(t2).*sin(t3).*1.84871004432e-3+cos(t6).^2.*sin(t2).*sin(t3).*5.8e-5-cos(t2).*cos(t4).*sin(t5).*5.019410232e-3+cos(t2).*cos(t3).*cos(t5).^2.*cos(t6).^2.*5.8e-5-cos(t5).^2.*cos(t6).^2.*sin(t2).*sin(t3).*5.8e-5-cos(t2).*cos(t4).*sin(t3).*sin(t5).*4.476771288e-3-cos(t3).*cos(t4).*sin(t2).*sin(t5).*4.476771288e-3-cos(t2).*cos(t4).*cos(t5).*sin(t3).*sin(t5).*1.84871004432e-3-cos(t3).*cos(t4).*cos(t5).*sin(t2).*sin(t5).*1.84871004432e-3+cos(t2).*cos(t6).*sin(t3).*sin(t4).*sin(t5).*sin(t6).*5.8e-5+cos(t3).*cos(t6).*sin(t2).*sin(t4).*sin(t5).*sin(t6).*5.8e-5-cos(t2).*cos(t4).*cos(t5).*cos(t6).^2.*sin(t3).*sin(t5).*5.8e-5-cos(t3).*cos(t4).*cos(t5).*cos(t6).^2.*sin(t2).*sin(t5).*5.8e-5;
+
+end
