@@ -58,8 +58,8 @@ m6 = 168.06e-3;
 
 m = [m1; m2; m3; m4; m5; m6];
 
-%% Forward Kinematics
-% Homogeneous transforms from forward kinematics
+%% Computation of Homogeneous Transformations
+% Define homogeneous transformations between each link
 T01 = [cos(t1) 0 sin(t1) 0;
        sin(t1) 0 -cos(t1) 0;
        0 1 0 0;
