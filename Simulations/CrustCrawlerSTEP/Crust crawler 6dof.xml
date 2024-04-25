@@ -1,0 +1,1961 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<SimscapeMultibodyImportXML version="2.0" xmlns="urn:mathworks:SimscapeMultibody:import" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<Created by="" on="03/28/24||09:53:49" using="Simscape Multibody Link Version 7.4" from="SolidWorks 32.1.0"/>
+<ModelUnits mass="kilogram" length="millimeter"/>
+<DataUnits mass="kilogram" length="meter"/>
+<RootAssembly name="Crust crawler" uid="Crust crawler" version="1234">
+<AssemblyFile name="Crust crawler.SLDASM" type="SolidWorks Assembly"/>
+<InstanceTree>
+<Instance name="Servo-Disc-6" uid="Servo-Disc-6" entityUid="Servo-Disc*:*Default">
+<Transform>
+<Rotation>0.42723562174572538 0.56200817969960482 0.70824891772757403 -0.85732359816639203 0.50061664605145917 0.11991339259323283 -0.28716889026942716 -0.65842978338386593 0.69570413885106441</Rotation>
+<Translation>0.075110896091598101 0.44871601462984823 0.17273400759435531</Translation>
+</Transform>
+</Instance>
+<Instance name="Finger-2" uid="Finger-2" entityUid="Finger*:*Default">
+<Transform>
+<Rotation>0.70824891772756471 -0.4272356217457326 -0.56200817969961114 0.11991339259323711 0.8573235981663907 -0.50061664605146028 0.69570413885107318 0.28716889026942011 0.6584297833838596</Rotation>
+<Translation>0.050814631883463891 0.43455968198325817 0.20122361344504744</Translation>
+</Transform>
+</Instance>
+<Instance name="Servo-disc-link_MX-28T-1" uid="Servo-disc-link_MX-28T-1" entityUid="Servo-disc-link_MX-28T*:*Default">
+<Transform>
+<Rotation>0.42723562174572605 0.51205562479447231 -0.74516357977821579 -0.85732359816639181 -0.032334510861729782 -0.51376135260874167 -0.28716889026942655 0.8583434723487301 0.42518291585828183</Rotation>
+<Translation>0.0094744579133083234 0.44435293412819105 0.15200873824529135</Translation>
+</Transform>
+</Instance>
+<Instance name="Servo-Disc-8" uid="Servo-Disc-8" entityUid="Servo-Disc*:*Default">
+<Transform>
+<Rotation>-0.42723562174572494 -0.63260913166623511 0.64596858286145453 0.85732359816639225 -0.51037197270194534 0.067206379960201207 0.28716889026942666 0.58251706928880365 0.76039982407192153</Rotation>
+<Translation>0.058940027808522581 0.48116571282044623 0.18360335009105286</Translation>
+</Transform>
+</Instance>
+<Instance name="Servo-Disc-14" uid="Servo-Disc-14" entityUid="Servo-Disc*:*Default">
+<Transform>
+<Rotation>0.35619572157540069 -0.65615389346064301 0.66527188128450054 -0.92221633337755993 -0.13220940023467065 0.36336993400835715 -0.15047140054850572 -0.74295541090029593 -0.65220826047432379</Rotation>
+<Translation>0.16014804043604491 0.44362186764886241 0.070652535376498446</Translation>
+</Transform>
+</Instance>
+<Instance name="Servo-Disc-15" uid="Servo-Disc-15" entityUid="Servo-Disc*:*Default">
+<Transform>
+<Rotation>-0.3561957215754008 -0.89628085780701416 0.26420679752819082 0.92221633337756004 -0.38273394851333065 -0.055061412141756236 0.15047140054850539 0.22404318464108208 0.962893041325387</Rotation>
+<Translation>0.14785928804169352 0.47543833115038819 0.075843798695421988</Translation>
+</Transform>
+</Instance>
+<Instance name="Servo-Disc-9" uid="Servo-Disc-9" entityUid="Servo-Disc*:*Default">
+<Transform>
+<Rotation>-0.42723562174572555 -0.63260913166694177 0.64596858286076209 0.85732359816639181 -0.51037197270202006 0.067206379959642085 0.28716889026942777 0.58251706928797065 0.76039982407255913</Rotation>
+<Translation>0.035860274630769989 0.48018949430579611 0.15218087420728971</Translation>
+</Transform>
+</Instance>
+<Instance name="MX-28T-4" uid="MX-28T-4" entityUid="MX-28T*:*Default">
+<Transform>
+<Rotation>0.38914246537343816 -0.84952501409579573 0.3561957215754008 -1.1384000392324317e-15 -0.38667432608287983 -0.92221633337755982 0.92117758420571783 0.35887353757819579 -0.15047140054850555</Rotation>
+<Translation>0.15382556637808148 0.45999120756631334 0.073323402736238913</Translation>
+</Transform>
+</Instance>
+<Instance name="Servo-disc-link_MX-28T-2" uid="Servo-disc-link_MX-28T-2" entityUid="Servo-disc-link_MX-28T*:*Default">
+<Transform>
+<Rotation>0.42723562174572538 0.70824891772756904 -0.56200817969961148 -0.85732359816639203 0.11991339259322832 -0.50061664605146039 -0.2871688902694271 0.69570413885107052 0.6584297833838596</Rotation>
+<Translation>0.037061700132384016 0.44392555269882988 0.19432758676374984</Translation>
+</Transform>
+</Instance>
+<Instance name="Finger-1" uid="Finger-1" entityUid="Finger*:*Default">
+<Transform>
+<Rotation>-0.51205562479447331 0.4272356217457256 -0.74516357977821535 0.03233451086173196 -0.85732359816639125 -0.51376135260874256 -0.85834347234872932 -0.28716889026942927 0.42518291585828155</Rotation>
+<Translation>0.0087027712025595904 0.45441720283697035 0.16634515498651153</Translation>
+</Transform>
+</Instance>
+<Instance name="MX-64T-2" uid="MX-64T-2" entityUid="MX-64T*:*Default">
+<Transform>
+<Rotation>0.74672933683036269 -0.35619572157540202 0.56171158564539603 0.37774022366094206 0.92221633337755937 0.0826399290913995 -0.54745558810324324 0.15047140054850539 0.82319544257211663</Rotation>
+<Translation>0.12923025180330172 0.52367024538603779 0.083713452944093852</Translation>
+</Transform>
+</Instance>
+<Instance name="Servo-Disc-7" uid="Servo-Disc-7" entityUid="Servo-Disc*:*Default">
+<Transform>
+<Rotation>0.42723562174572571 -0.88898822499130536 0.16483221571753309 -0.8573235981663917 -0.34042018444453465 0.38614808823789393 -0.28716889026942732 -0.30629076683693435 -0.90759021293305508</Rotation>
+<Translation>0.052031142913845529 0.44773979611519826 0.14131153171059177</Translation>
+</Transform>
+</Instance>
+<Instance name="MX-28T-5" uid="MX-28T-5" entityUid="MX-28T*:*Default">
+<Transform>
+<Rotation>0.46607301004143981 0.56171158564542334 -0.68356129488336037 -0.85369839947560355 0.082639929091314568 -0.51416892637787359 -0.23232518598659219 0.82319544257210686 0.51804852213360142</Rotation>
+<Translation>0.097961673893914136 0.50027925056339329 0.12974985046533516</Translation>
+</Transform>
+</Instance>
+<Instance name="Servo-Disc-17" uid="Servo-Disc-17" entityUid="Servo-Disc*:*Default">
+<Transform>
+<Rotation>-0.56171158564536294 0.46607301004142776 -0.68356129488341788 -0.082639929091360267 -0.85369839947563841 -0.51416892637780864 -0.82319544257214339 -0.23232518598648882 0.51804852213358976</Rotation>
+<Translation>0.11771516429760275 0.52197612683965577 0.066837946371372123</Translation>
+</Transform>
+</Instance>
+<Instance name="Servo-disc-link_MX-64T-2" uid="Servo-disc-link_MX-64T-2" entityUid="Servo-disc-link_MX-64T*:*Default">
+<Transform>
+<Rotation>0.5617115856454179 -0.46607301004144597 -0.68356129488336037 0.082639929091324726 0.85369839947560289 -0.51416892637787304 0.82319544257210941 0.23232518598658222 0.51804852213360164</Rotation>
+<Translation>0.1084067813205023 0.49336142827531343 0.099507397429285036</Translation>
+</Transform>
+</Instance>
+<Instance name="Servo-Disc-16" uid="Servo-Disc-16" entityUid="Servo-Disc*:*Default">
+<Transform>
+<Rotation>0.56171158564541734 -0.46607301004166601 -0.68356129488321093 0.082639929091324477 0.85369839947543757 -0.51416892637814771 0.82319544257210975 0.23232518598674878 0.51804852213352637</Rotation>
+<Translation>0.1434415549200132 0.52576103559205767 0.10454029764129659</Translation>
+</Transform>
+</Instance>
+<Instance name="Link-plate-3" uid="Link-plate-3" entityUid="Link-plate*:*Default">
+<Transform>
+<Rotation>-0.56171158564542412 -0.46607301004143947 0.6835612948833597 -0.082639929091314457 0.85369839947560355 0.51416892637787348 -0.8231954425721062 0.23232518598659277 -0.51804852213360197</Rotation>
+<Translation>0.10352151730242209 0.50355064463100974 0.10606971908632373</Translation>
+</Transform>
+</Instance>
+<Instance name="Servo-Disc-20" uid="Servo-Disc-20" entityUid="Servo-Disc*:*Default">
+<Transform>
+<Rotation>-0.68356129488335959 0.1163564864965964 -0.72055889709832321 -0.51416892637787404 0.6239190922842005 0.58851956758521085 0.51804852213360186 0.77277819219581156 -0.36666005288518183</Rotation>
+<Translation>0.083880311219308779 0.48968737068001256 0.14042165002128018</Translation>
+</Transform>
+</Instance>
+<Instance name="connection plate m28-1" uid="connection plate m28-1" entityUid="connection plate m28*:*Default">
+<Transform>
+<Rotation>0.68356129488336037 -0.4272356217457246 0.59178854301931838 0.51416892637787359 0.8573235981663917 0.025031243965414285 -0.5180485221336012 0.28716889026942916 0.80570450984006292</Rotation>
+<Translation>0.12003445018640085 0.51612023018782793 0.1302841965890669</Translation>
+</Transform>
+</Instance>
+<Instance name="Servo-link-link_MX-64T-2" uid="Servo-link-link_MX-64T-2" entityUid="Servo-link-link_MX-64T*:*Default">
+<Transform>
+<Rotation>0.56171158564539692 -0.7467293368303628 0.35619572157540075 0.08263992909139932 -0.3777402236609409 -0.92221633337755993 0.82319544257211608 0.54745558810324424 -0.15047140054850516</Rotation>
+<Translation>0.16069744092561464 0.48378185501966042 0.071712522866801409</Translation>
+</Transform>
+</Instance>
+<Instance name="Servo-link-link_MX-28T-1" uid="Servo-link-link_MX-28T-1" entityUid="Servo-link-link_MX-28T*:*Default">
+<Transform>
+<Rotation>0.42723562174572582 -0.59178854301931649 0.68356129488336126 -0.85732359816639192 -0.025031243965415968 0.51416892637787315 -0.28716889026942677 -0.80570450984006436 -0.51804852213360042</Rotation>
+<Translation>0.093971345565198414 0.48141264449917998 0.15228006321087503</Translation>
+</Transform>
+</Instance>
+<Instance name="Link-1-1" uid="Link-1-1" entityUid="Link-1*:*Default">
+<Transform>
+<Rotation>-0.38914246537364128 -0.64206849356692153 0.6605423462667841 2.2654838074953609e-14 0.71706298285187853 0.69700837772839308 -0.92117758420563201 0.27123555849532405 -0.27903965697514255</Rotation>
+<Translation>0.1311674849218944 0.25353603386192053 0.086151788794573969</Translation>
+</Transform>
+</Instance>
+<Instance name="MX-28T-2" uid="MX-28T-2" entityUid="MX-28T*:*Default">
+<Transform>
+<Rotation>0.59178854301928219 -0.68356129488339168 0.42723562174572471 0.025031243965387601 -0.5141689263778747 -0.85732359816639181 0.80570450984009045 0.5180485221335589 -0.2871688902694286</Rotation>
+<Translation>0.043230089105884155 0.46540066223742554 0.14722721085014301</Translation>
+</Transform>
+</Instance>
+<Instance name="Servo-Disc-2" uid="Servo-Disc-2" entityUid="Servo-Disc*:*Default">
+<Transform>
+<Rotation>-0.38914246537362301 -8.2527963192153731e-15 0.92117758420563978 1.0915169377167817e-15 1 9.4200641224226837e-15 -0.92117758420563978 4.6712279123826608e-15 -0.38914246537362301</Rotation>
+<Translation>0.04479399167684938 0.19035895405268322 0.094794632737819365</Translation>
+</Transform>
+</Instance>
+<Instance name="Servo-disc-link_MX-64T-1" uid="Servo-disc-link_MX-64T-1" entityUid="Servo-disc-link_MX-64T*:*Default">
+<Transform>
+<Rotation>-0.38914246537343861 -0.84952501409579551 -0.35619572157540119 1.0518284999128733e-15 -0.38667432608288027 0.9222163333775597 -0.92117758420571771 0.35887353757819618 0.15047140054850583</Rotation>
+<Translation>0.19724090011211523 0.38343904522177968 0.058782503962825909</Translation>
+</Transform>
+</Instance>
+<Instance name="MX-64T-1" uid="MX-64T-1" entityUid="MX-64T*:*Default">
+<Transform>
+<Rotation>-0.64206849356685158 0.66054234626686203 -0.38914246537362457 0.71706298285196279 0.69700837772830626 3.8209452962734147e-15 0.27123555849526637 -0.27903965697517563 -0.92117758420563911</Rotation>
+<Translation>0.1999627036231709 0.34356139547736392 0.057089921169541202</Translation>
+</Transform>
+</Instance>
+<Instance name="MX-106T-1" uid="MX-106T-1" entityUid="MX-106T*:*Default">
+<Transform>
+<Rotation>1 -1.1491199492892865e-16 0 0 -1.304284100816455e-16 1 -1.1491199492892872e-16 -0.99999999999999989 -1.304284100816455e-16</Rotation>
+<Translation>0.056001294679593402 0.10675895405268303 0.12132454716294822</Translation>
+</Transform>
+</Instance>
+<Instance name="Servo-link-link_MX-64T-1" uid="Servo-link-link_MX-64T-1" entityUid="Servo-link-link_MX-64T*:*Default">
+<Transform>
+<Rotation>-0.38914246537362435 0.64206849356693063 -0.66054234626678543 4.1542290440954588e-15 -0.71706298285187975 -0.69700837772839186 -0.92117758420563922 -0.27123555849529962 0.27903965697514271</Rotation>
+<Translation>0.15568552628136062 0.3196063230092876 0.070909330335420337</Translation>
+</Transform>
+</Instance>
+<Instance name="Servo-Disc-4" uid="Servo-Disc-4" entityUid="Servo-Disc*:*Default">
+<Transform>
+<Rotation>-0.38914246537343861 -0.85257330841033618 0.34883648809913176 4.5985184675841142e-16 0.37868538496832255 0.92552546113620948 -0.92117758420571771 0.36016125971243346 -0.14736256430746236</Rotation>
+<Translation>0.1898449995233869 0.34356139547739645 0.033139303980258578</Translation>
+</Transform>
+</Instance>
+<Instance name="MX-28T-Link-1" uid="MX-28T-Link-1" entityUid="MX-28T-Link*:*Default">
+<Transform>
+<Rotation>-0.59178854301928629 0.42723562174572521 -0.6835612948833879 -0.025031243965392597 -0.85732359816639214 -0.51416892637787392 -0.80570450984008735 -0.28716889026942694 0.51804852213356467</Rotation>
+<Translation>0.06972301620699016 0.45945602910197508 0.15215530891131102</Translation>
+</Transform>
+</Instance>
+<Instance name="Link-plate-2" uid="Link-plate-2" entityUid="Link-plate*:*Default">
+<Transform>
+<Rotation>-0.38914246537343811 -0.84952501409579573 -0.35619572157540086 1.6007618236994224e-15 -0.3866743260828801 0.9222163333775597 -0.92117758420571771 0.35887353757819562 0.150471400548506</Rotation>
+<Translation>0.1612166276007711 0.44085521864872901 0.070201121174857425</Translation>
+</Transform>
+</Instance>
+<Instance name="Link-2-1" uid="Link-2-1" entityUid="Link-2*:*Default">
+<Transform>
+<Rotation>-0.38914246537343894 -0.84952501409579528 -0.35619572157540103 8.7721762322470967e-16 -0.38667432608288016 0.9222163333775597 -0.92117758420571738 0.35887353757819651 0.15047140054850575</Rotation>
+<Translation>0.18376824694974453 0.41479440055661676 0.060674410036755055</Translation>
+</Transform>
+</Instance>
+<Instance name="Servo-Disc-5" uid="Servo-Disc-5" entityUid="Servo-Disc*:*Default">
+<Transform>
+<Rotation>0.38914246537362412 0.8039321799709982 -0.44973457911307685 -4.30211422042248e-15 0.48821702440892406 0.87272225654975488 0.92117758420563933 -0.33961329050020211 0.18998597651586702</Rotation>
+<Translation>0.207745552930588 0.34356139547739212 0.075513472853677793</Translation>
+</Transform>
+</Instance>
+<Instance name="MX-106T-2" uid="MX-106T-2" entityUid="MX-106T*:*Default">
+<Transform>
+<Rotation>-0.92117758420564 1.6100542245391804e-15 -0.38914246537362285 1.286721097779659e-15 1 1.0915169377165482e-15 0.38914246537362285 5.0476311556703714e-16 -0.92117758420564</Rotation>
+<Translation>0.056001294679615732 0.19035895405268305 0.12132454716293926</Translation>
+</Transform>
+</Instance>
+<Instance name="Link-plate-1" uid="Link-plate-1" entityUid="Link-plate*:*Default">
+<Transform>
+<Rotation>-0.38914246537362879 -0.64206849356692874 0.66054234626678443 7.3170636216701723e-15 0.71706298285187942 0.6970083777283923 -0.92117758420563733 0.27123555849530501 -0.27903965697514382</Rotation>
+<Translation>0.16607688125964623 0.3078048656999165 0.071404655572378947</Translation>
+</Transform>
+</Instance>
+<Instance name="Base-disc-1" uid="Base-disc-1" entityUid="Base-disc*:*Default">
+<Transform>
+<Rotation>-0.38914246537362224 0 0.92117758420564033 -1.2014772770651625e-16 1 0 -0.92117758420564033 -1.304284100777025e-16 -0.38914246537362224</Rotation>
+<Translation>0.056001294679615218 0.13655895405268306 0.12132454716293814</Translation>
+</Transform>
+</Instance>
+<Instance name="Servo-link-link_MX-106T-1" uid="Servo-link-link_MX-106T-1" entityUid="Servo-link-link_MX-106T*:*Default">
+<Transform>
+<Rotation>-0.38914246537362285 0.92117758420564 -1.4678483572596745e-16 -2.0842442255291024e-16 -2.4739163573850822e-16 -0.99999999999999978 -0.92117758420564 -0.38914246537362285 2.8826649710084174e-16</Rotation>
+<Translation>0.04043248982234933 0.13805895405268306 0.12301638501461716</Translation>
+</Transform>
+</Instance>
+<Instance name="Servo-Disc-3" uid="Servo-Disc-3" entityUid="Servo-Disc*:*Default">
+<Transform>
+<Rotation>0.38914246537363928 0.64206849356694717 0.66054234626676045 -2.1125679330880054e-14 -0.71706298285185266 0.69700837772841973 0.921177584205633 -0.27123555849533199 -0.27903965697513206</Rotation>
+<Translation>0.064757000150523034 0.19035895405268002 0.14205104280756986</Translation>
+</Transform>
+</Instance>
+<Instance name="MX-28T-1" uid="MX-28T-1" entityUid="MX-28T*:*Default">
+<Transform>
+<Rotation>0.59178854301928652 -0.68356129488338757 0.4272356217457251 0.025031243965391737 -0.51416892637787448 -0.85732359816639159 0.80570450984008712 0.51804852213356434 -0.28716889026942799</Rotation>
+<Translation>0.066309842283636289 0.46637688075207617 0.17864968673390486</Translation>
+</Transform>
+</Instance>
+<Instance name="Base-1" uid="Base-1" grounded="true" entityUid="Base*:*Default">
+<Transform>
+<Rotation>1 0 0 0 1 0 0 0 1</Rotation>
+<Translation>0.055101294679593391 0.11375895405268302 0.12207454716294822</Translation>
+</Transform>
+</Instance>
+<Instance name="Servo-disc-link_MX-106T-2" uid="Servo-disc-link_MX-106T-2" entityUid="Servo-disc-link_MX-106T*:*Default">
+<Transform>
+<Rotation>0.38914246537363995 0.64206849356692142 0.6605423462667851 -2.1076239711814715e-14 -0.71706298285187964 0.69700837772839197 0.92117758420563267 -0.27123555849532172 -0.27903965697514299</Rotation>
+<Translation>0.069457022740199242 0.22580855969200792 0.10554453314596395</Translation>
+</Transform>
+</Instance>
+</InstanceTree>
+<Constraints>
+<Coincident name="Coincident3">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Base-1</Uid>
+</InstancePath>
+<Position>0 0.009999999999999995 0</Position>
+<Axis>0 1 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>MX-106T-1</Uid>
+</InstancePath>
+<Position>-0.020903999999999999 -0.051902000000000004 0.016999999999999987</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Concentric name="Concentric1">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>MX-106T-1</Uid>
+</InstancePath>
+<Position>0 0 0.030800000000003491</Position>
+<Axis>0 0 -1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Base-disc-1</Uid>
+</InstancePath>
+<Position>0 0 0</Position>
+<Axis>0 1 0</Axis>
+</ConstraintGeometry>
+</Concentric>
+<Coincident name="Coincident4">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>MX-106T-1</Uid>
+</InstancePath>
+<Position>0.0028639490833659992 0.0028639490833659853 0.030799999999999994</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Base-disc-1</Uid>
+</InstancePath>
+<Position>0 0.0010000000000000009 0</Position>
+<Axis>0 1 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident5">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Base-1</Uid>
+</InstancePath>
+<Position>0 -0.10000000000000001 -0.01525</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>MX-106T-1</Uid>
+</InstancePath>
+<Position>0.01560000000000001 0.014499999999999999 -0.021860000000000004</Position>
+<Axis>0 0.99999999999999989 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident6">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Base-1</Uid>
+</InstancePath>
+<Position>0.021000000000000005 -0.10000000000000001 0</Position>
+<Axis>-1 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>MX-106T-1</Uid>
+</InstancePath>
+<Position>0.020100000000000014 -0.045662000000000008 0.013386050916629991</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Parallel name="Parallel1">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Base-1</Uid>
+</InstancePath>
+<Position>0 0.009999999999999995 0</Position>
+<Axis>0 1 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>MX-106T-1</Uid>
+</InstancePath>
+<Position>-0.020903999999999999 -0.051902000000000004 0.016999999999999987</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+</Parallel>
+<Coincident name="Coincident7">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Base-disc-1</Uid>
+</InstancePath>
+<Position>0 0.0010000000000000009 0</Position>
+<Axis>0 1 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Servo-link-link_MX-106T-1</Uid>
+</InstancePath>
+<Position>-0.022499999999999964 0.030000000000000006 0.00050000000000000044</Position>
+<Axis>0 0 0.99999999999999978</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident8">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Base-disc-1</Uid>
+</InstancePath>
+<Position>-0.010000000000000009 0.0010000000000000009 -0.0074999999999999997</Position>
+<Axis>0 1 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-link-link_MX-106T-1</Uid>
+</InstancePath>
+<Position>-0.014499999999999957 0.0075000000000000067 0.00050000000000000044</Position>
+<Axis>0 0 0.99999999999999978</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident9">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Base-disc-1</Uid>
+</InstancePath>
+<Position>0.010000000000000009 0.0010000000000000009 0.0075000000000000067</Position>
+<Axis>0 1 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-link-link_MX-106T-1</Uid>
+</InstancePath>
+<Position>0.0055000000000000604 0.022500000000000006 0.00050000000000000044</Position>
+<Axis>0 0 0.99999999999999978</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident11">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-link-link_MX-106T-1</Uid>
+</InstancePath>
+<Position>0.012500000000000053 0.026000000000000009 -0.004500000000000004</Position>
+<Axis>1.0000000000000002 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>MX-106T-2</Uid>
+</InstancePath>
+<Position>-0.010999999999999996 -0.047800000000000009 0.017000000000001167</Position>
+<Axis>0 1.2849803525759048e-15 -1.0000000000000002</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident12">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-link-link_MX-106T-1</Uid>
+</InstancePath>
+<Position>0.012500000000000053 0.0040000000000000036 -0.004500000000000004</Position>
+<Axis>1.0000000000000002 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>MX-106T-2</Uid>
+</InstancePath>
+<Position>0.010999999999999996 -0.047799999999999981 0.017000000000001167</Position>
+<Axis>0 1.692413147296907e-15 -1.0000000000000002</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Concentric name="Concentric4">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>MX-106T-2</Uid>
+</InstancePath>
+<Position>0 0 0.030800000000003533</Position>
+<Axis>0 0 1.0000000000000002</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-Disc-2</Uid>
+</InstancePath>
+<Position>0.0019999999999999879 0 0</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+</Concentric>
+<Coincident name="Coincident13">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>MX-106T-2</Uid>
+</InstancePath>
+<Position>0.0028639490833660061 0.0028639490833660131 0.030800000000000008</Position>
+<Axis>0 0 1.0000000000000002</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Servo-Disc-2</Uid>
+</InstancePath>
+<Position>0.0019999999999999879 0 0</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Concentric name="Concentric5">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>MX-106T-2</Uid>
+</InstancePath>
+<Position>0 0 -0.024500000000003491</Position>
+<Axis>0 0 -1.0000000000000002</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-Disc-3</Uid>
+</InstancePath>
+<Position>0.0020000000000000295 0 0</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+</Concentric>
+<Coincident name="Coincident14">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>MX-106T-2</Uid>
+</InstancePath>
+<Position>0.0041686691350830141 0.0041600000000000248 -0.024500000000000022</Position>
+<Axis>0 0 -1.0000000000000002</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Servo-Disc-3</Uid>
+</InstancePath>
+<Position>0.0020000000000000295 0 0</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident15">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-Disc-3</Uid>
+</InstancePath>
+<Position>0.0020000000000000018 0.0094999999999999807 0</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-disc-link_MX-106T-2</Uid>
+</InstancePath>
+<Position>0.033800000000000038 0.021999999999999992 -0.037999999999999978</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident16">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-Disc-3</Uid>
+</InstancePath>
+<Position>0.0020000000000000018 -0.0095000000000000084 0</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-disc-link_MX-106T-2</Uid>
+</InstancePath>
+<Position>0.033800000000000038 0.0030000000000000027 -0.038000000000000006</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident18">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-disc-link_MX-106T-2</Uid>
+</InstancePath>
+<Position>-0.010849999999999957 0.0050000000000000044 0.00050000000000000044</Position>
+<Axis>0 0 0.99999999999999989</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Link-1-1</Uid>
+</InstancePath>
+<Position>0.017000000000000043 0.019999999999999976 -0.065000000000000002</Position>
+<Axis>0 0 0.99999999999999989</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident22">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-disc-link_MX-106T-2</Uid>
+</InstancePath>
+<Position>0.023150000000000073 0.020000000000000018 0.00049999999999997269</Position>
+<Axis>0 0 0.99999999999999989</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Link-1-1</Uid>
+</InstancePath>
+<Position>-0.01699999999999996 0.0049999999999999906 -0.06500000000000003</Position>
+<Axis>0 0 0.99999999999999989</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident23">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Link-1-1</Uid>
+</InstancePath>
+<Position>0.017000000000000015 0.020000000000000004 0.064999999999999974</Position>
+<Axis>0 0 0.99999999999999989</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Link-plate-1</Uid>
+</InstancePath>
+<Position>0.016999999999999987 0.0074999999999999789 0</Position>
+<Axis>1.1102230246251565e-16 0 0.99999999999999989</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident24">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Link-1-1</Uid>
+</InstancePath>
+<Position>-0.016999999999999987 0.0050000000000000183 0.064999999999999974</Position>
+<Axis>0 0 0.99999999999999989</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Link-plate-1</Uid>
+</InstancePath>
+<Position>-0.017000000000000015 -0.0075000000000000067 0</Position>
+<Axis>1.1102230246251565e-16 0 0.99999999999999989</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident27">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Link-plate-1</Uid>
+</InstancePath>
+<Position>0.0099999999999999811 0.0074999999999999789 0.00099999999999994538</Position>
+<Axis>1.1102230246251565e-16 0 0.99999999999999989</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-link-link_MX-64T-1</Uid>
+</InstancePath>
+<Position>0.0055000000000000326 0.0075000000000000067 0.00049999999999994493</Position>
+<Axis>0 0 0.99999999999999989</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident32">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Link-plate-1</Uid>
+</InstancePath>
+<Position>-0.010000000000000009 -0.0075000000000000344 0.00099999999999994538</Position>
+<Axis>1.1102230246251565e-16 0 0.99999999999999989</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-link-link_MX-64T-1</Uid>
+</InstancePath>
+<Position>-0.014499999999999957 0.02250000000000002 0.00049999999999994493</Position>
+<Axis>0 0 0.99999999999999989</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident33">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-link-link_MX-64T-1</Uid>
+</InstancePath>
+<Position>0.012500000000000053 0.0040000000000000036 -0.004500000000000004</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>MX-64T-1</Uid>
+</InstancePath>
+<Position>0.010999999999999954 -0.045300000000000007 0.017000000000003346</Position>
+<Axis>0 0 -0.99999999999999989</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident34">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-link-link_MX-64T-1</Uid>
+</InstancePath>
+<Position>0.012500000000000039 0.025999999999999995 -0.0045000000000000595</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>MX-64T-1</Uid>
+</InstancePath>
+<Position>-0.010999999999999996 -0.045300000000000007 0.017000000000003346</Position>
+<Axis>0 0 -0.99999999999999989</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Concentric name="Concentric6">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>MX-64T-1</Uid>
+</InstancePath>
+<Position>0 0 0.028000000000003356</Position>
+<Axis>7.2164496600635175e-16 0 -0.99999999999999989</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Servo-Disc-4</Uid>
+</InstancePath>
+<Position>0.0020000000000000018 0 0</Position>
+<Axis>-1 1.1102230246251565e-16 0</Axis>
+</ConstraintGeometry>
+</Concentric>
+<Coincident name="Coincident35">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>MX-64T-1</Uid>
+</InstancePath>
+<Position>0.0028655948462510128 0.0028599999999999737 0.028000000000000025</Position>
+<Axis>0 0 0.99999999999999989</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Servo-Disc-4</Uid>
+</InstancePath>
+<Position>0.0020000000000000018 0 0</Position>
+<Axis>1 -1.1102230246251565e-16 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Concentric name="Concentric7">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>MX-64T-1</Uid>
+</InstancePath>
+<Position>0 0 -0.022000000000003211</Position>
+<Axis>0 0 -0.99999999999999989</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Servo-Disc-5</Uid>
+</InstancePath>
+<Position>0.001999999999999974 0 0</Position>
+<Axis>-1 0 0</Axis>
+</ConstraintGeometry>
+</Concentric>
+<Coincident name="Coincident36">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>MX-64T-1</Uid>
+</InstancePath>
+<Position>0.0041599901923939642 0.004159999999999997 -0.021999999999999964</Position>
+<Axis>0 0 -0.99999999999999989</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Servo-Disc-5</Uid>
+</InstancePath>
+<Position>0.001999999999999974 0 0</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident37">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-Disc-4</Uid>
+</InstancePath>
+<Position>0.0020000000000000157 0.0067175144212722072 -0.0067175144212722193</Position>
+<Axis>1 -1.1102230246251565e-16 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-disc-link_MX-64T-1</Uid>
+</InstancePath>
+<Position>0.028500000000000053 0.02200000000000002 -0.038000000000000034</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident38">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-Disc-4</Uid>
+</InstancePath>
+<Position>0.0020000000000000157 -0.0067175144212721673 0.0067175144212721638</Position>
+<Axis>1 -1.1102230246251565e-16 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-disc-link_MX-64T-1</Uid>
+</InstancePath>
+<Position>0.028500000000000039 0.0030000000000000027 -0.037999999999999978</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident39">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-disc-link_MX-64T-1</Uid>
+</InstancePath>
+<Position>0.02050000000000006 0.020000000000000018 0.00049999999999994493</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Link-2-1</Uid>
+</InstancePath>
+<Position>0.017000000000000015 0.019999999999999907 -0.03350000000000003</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident40">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-disc-link_MX-64T-1</Uid>
+</InstancePath>
+<Position>-0.013499999999999956 0.0049999999999999489 0.00049999999999994493</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Link-2-1</Uid>
+</InstancePath>
+<Position>-0.01699999999999996 0.0049999999999999489 -0.033499999999999974</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident52">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-link-link_MX-28T-1</Uid>
+</InstancePath>
+<Position>0.0085000000000000075 0.0039999999999999758 -0.004500000000000004</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>MX-28T-1</Uid>
+</InstancePath>
+<Position>-0.0085000000000000075 -0.035800000000000054 0.01500000000000401</Position>
+<Axis>0 0 -0.99999999999999978</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident53">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-link-link_MX-28T-1</Uid>
+</InstancePath>
+<Position>0.0085000000000000075 0.025999999999999995 -0.0044999999999999762</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>MX-28T-2</Uid>
+</InstancePath>
+<Position>0.0085000000000000075 -0.035799999999999943 0.015000000000004066</Position>
+<Axis>0 0 -1</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident55">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>MX-28T-1</Uid>
+</InstancePath>
+<Position>-0.015000000000000013 -0.029500000000000054 0.015000000000004066</Position>
+<Axis>0 0 -0.99999999999999978</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>MX-28T-Link-1</Uid>
+</InstancePath>
+<Position>-0.0045000000000000318 0 -0.017000000000000043</Position>
+<Axis>0 1.0000000000000002 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident56">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>MX-28T-1</Uid>
+</InstancePath>
+<Position>-0.014999999999999986 0.0044999999999999762 0.015000000000003955</Position>
+<Axis>0 0 -0.99999999999999978</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>MX-28T-Link-1</Uid>
+</InstancePath>
+<Position>-0.0045000000000000318 0 0.01699999999999996</Position>
+<Axis>0 1.0000000000000002 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Concentric name="Concentric8">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>MX-28T-2</Uid>
+</InstancePath>
+<Position>0 0 0.017749999999999988</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Servo-Disc-7</Uid>
+</InstancePath>
+<Position>0.0020000000000000573 0 0</Position>
+<Axis>-1.0000000000000002 0 0</Axis>
+</ConstraintGeometry>
+</Concentric>
+<Coincident name="Coincident60">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>MX-28T-2</Uid>
+</InstancePath>
+<Position>-0.0029639999999999944 -0.002970176758746973 0.022599999999999953</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Servo-Disc-7</Uid>
+</InstancePath>
+<Position>0.0020000000000000573 0 0</Position>
+<Axis>1.0000000000000002 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Concentric name="Concentric9">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>MX-28T-1</Uid>
+</InstancePath>
+<Position>0 0 0.017749999999999988</Position>
+<Axis>0 0 0.99999999999999978</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Servo-Disc-6</Uid>
+</InstancePath>
+<Position>0.0020000000000000573 0 0</Position>
+<Axis>-1 0 0</Axis>
+</ConstraintGeometry>
+</Concentric>
+<Coincident name="Coincident61">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>MX-28T-1</Uid>
+</InstancePath>
+<Position>-0.0029639999999999944 -0.0029701767587470007 0.022599999999999953</Position>
+<Axis>0 0 0.99999999999999978</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Servo-Disc-6</Uid>
+</InstancePath>
+<Position>0.0020000000000000573 0 0</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident62">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>MX-28T-2</Uid>
+</InstancePath>
+<Position>0.0031265018513120246 0.0031199999999999561 -0.019249999999999989</Position>
+<Axis>0 0 -1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Servo-Disc-9</Uid>
+</InstancePath>
+<Position>0.0020000000000000018 0 0</Position>
+<Axis>1.0000000000000002 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Concentric name="Concentric10">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>MX-28T-2</Uid>
+</InstancePath>
+<Position>0 0 -0.017049999999996013</Position>
+<Axis>0 0 -1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Servo-Disc-9</Uid>
+</InstancePath>
+<Position>0.0020000000000000018 0 0</Position>
+<Axis>-1.0000000000000002 0 0</Axis>
+</ConstraintGeometry>
+</Concentric>
+<Coincident name="Coincident63">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>MX-28T-1</Uid>
+</InstancePath>
+<Position>0.0031265018513119969 0.0031199999999999839 -0.019249999999999989</Position>
+<Axis>0 0 -0.99999999999999978</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Servo-Disc-8</Uid>
+</InstancePath>
+<Position>0.0020000000000000018 0 0</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Concentric name="Concentric11">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>MX-28T-1</Uid>
+</InstancePath>
+<Position>0 0 -0.017049999999996013</Position>
+<Axis>0 0 -0.99999999999999978</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Servo-Disc-8</Uid>
+</InstancePath>
+<Position>0.0020000000000000018 0 0</Position>
+<Axis>-1 0 0</Axis>
+</ConstraintGeometry>
+</Concentric>
+<Coincident name="Coincident64">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-Disc-7</Uid>
+</InstancePath>
+<Position>0.0020000000000000018 -0.0067175144212722193 -0.0067175144212722193</Position>
+<Axis>1.0000000000000002 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-disc-link_MX-28T-1</Uid>
+</InstancePath>
+<Position>0.020350000000000035 0.021999999999999978 -0.037999999999999978</Position>
+<Axis>1.0000000000000002 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident65">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-Disc-7</Uid>
+</InstancePath>
+<Position>0.0020000000000000573 0.0067175144212721638 0.0067175144212721916</Position>
+<Axis>1.0000000000000002 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-disc-link_MX-28T-1</Uid>
+</InstancePath>
+<Position>0.020350000000000035 0.0029999999999999888 -0.037999999999999978</Position>
+<Axis>1.0000000000000002 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident66">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-Disc-6</Uid>
+</InstancePath>
+<Position>0.0020000000000000018 0 0.0095000000000000084</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-disc-link_MX-28T-2</Uid>
+</InstancePath>
+<Position>0.02035000000000009 0.021999999999999992 -0.038000000000000006</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident67">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-Disc-6</Uid>
+</InstancePath>
+<Position>0.0020000000000000573 0 -0.0094999999999999807</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-disc-link_MX-28T-2</Uid>
+</InstancePath>
+<Position>0.02035000000000009 0.0030000000000000027 -0.038000000000000006</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident68">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-disc-link_MX-28T-1</Uid>
+</InstancePath>
+<Position>0.0089250000000000163 0.020584999999999978 0.00050000000000000044</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Finger-1</Uid>
+</InstancePath>
+<Position>-0.0090000000000000913 0.021999999999999964 -0.00099999999999997313</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident74">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-disc-link_MX-28T-1</Uid>
+</InstancePath>
+<Position>-0.010075000000000001 0.020584999999999978 0.00050000000000000044</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Finger-1</Uid>
+</InstancePath>
+<Position>-0.0090000000000000635 0.0029999999999999472 -0.0010000000000000009</Position>
+<Axis>0 0 -1</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident77">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-disc-link_MX-28T-2</Uid>
+</InstancePath>
+<Position>0.0089250000000001273 0.0044149999999999745 0.00050000000000000044</Position>
+<Axis>0 0 1.0000000000000002</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Finger-2</Uid>
+</InstancePath>
+<Position>-0.0090000000000000913 0.0030000000000000027 -0.0010000000000000009</Position>
+<Axis>0 0 -1</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident79">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-disc-link_MX-28T-2</Uid>
+</InstancePath>
+<Position>-0.010074999999999945 0.0044149999999999745 0.00049999999999997269</Position>
+<Axis>0 0 1.0000000000000002</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Finger-2</Uid>
+</InstancePath>
+<Position>-0.0090000000000000635 0.02200000000000002 -0.00099999999999997313</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident102">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Link-2-1</Uid>
+</InstancePath>
+<Position>-0.012499999999999956 0.00099999999999988987 0.033499999999999974</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Link-plate-2</Uid>
+</InstancePath>
+<Position>0 0 0</Position>
+<Axis>0 0 -1</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident105">
+<ConstraintGeometry geomType="line">
+<InstancePath>
+<Uid>Link-2-1</Uid>
+</InstancePath>
+<Position>-0.022499999999999964 0 0.033499999999999919</Position>
+<Axis>0.99999999999999989 2.7755575615628914e-16 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="line">
+<InstancePath>
+<Uid>Link-plate-2</Uid>
+</InstancePath>
+<Position>-0.021500000000000019 -0.012499999999999956 0</Position>
+<Axis>0.99999999999999989 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident111">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>MX-28T-4</Uid>
+</InstancePath>
+<Position>-0.011647999999999992 -0.032860000000000056 0.017749999999999988</Position>
+<Axis>0 0 1.0000000000000002</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Servo-Disc-14</Uid>
+</InstancePath>
+<Position>0 0 0</Position>
+<Axis>-1 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Concentric name="Concentric13">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>MX-28T-4</Uid>
+</InstancePath>
+<Position>0 -1.1102230246251565e-16 0.017750000000000044</Position>
+<Axis>0 0 1.0000000000000002</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Servo-Disc-14</Uid>
+</InstancePath>
+<Position>0.0019999999999999463 0 0</Position>
+<Axis>-1 0 0</Axis>
+</ConstraintGeometry>
+</Concentric>
+<Parallel name="Parallel24">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Link-plate-2</Uid>
+</InstancePath>
+<Position>0 0 0</Position>
+<Axis>0 0 -1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Servo-Disc-14</Uid>
+</InstancePath>
+<Position>0.0019999999999999463 0 0</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+</Parallel>
+<Parallel name="Parallel26">
+<ConstraintGeometry geomType="line">
+<InstancePath>
+<Uid>Link-plate-2</Uid>
+</InstancePath>
+<Position>0.022499999999999978 -0.011499999999999955 0.0010000000000000564</Position>
+<Axis>0 1 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="line">
+<InstancePath>
+<Uid>MX-28T-4</Uid>
+</InstancePath>
+<Position>-0.017799999999999955 0.0060000000000000053 0.015000000000000013</Position>
+<Axis>-7.2164496600635175e-16 -1.0000000000000002 0</Axis>
+</ConstraintGeometry>
+</Parallel>
+<UnknownConstraint name="ProfileCenter2">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-Disc-14</Uid>
+</InstancePath>
+<Position>0.0019999999999999463 0 0</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Link-plate-2</Uid>
+</InstancePath>
+<Position>0 0 0.0010000000000000009</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+</UnknownConstraint>
+<Coincident name="Coincident117">
+<ConstraintGeometry geomType="line">
+<InstancePath>
+<Uid>Link-plate-2</Uid>
+</InstancePath>
+<Position>0.022499999999999992 -0.01150000000000001 0</Position>
+<Axis>0 1 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="line">
+<InstancePath>
+<Uid>Link-2-1</Uid>
+</InstancePath>
+<Position>0.02250000000000002 0.024999999999999967 0.033499999999999974</Position>
+<Axis>-1.1102230246251565e-16 -1 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Concentric name="Concentric14">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>MX-28T-4</Uid>
+</InstancePath>
+<Position>0 0 -0.017049999999995957</Position>
+<Axis>0 0 -1.0000000000000002</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Servo-Disc-15</Uid>
+</InstancePath>
+<Position>0.0020000000000000018 0 0</Position>
+<Axis>-1.0000000000000002 0 0</Axis>
+</ConstraintGeometry>
+</Concentric>
+<Coincident name="Coincident119">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>MX-28T-4</Uid>
+</InstancePath>
+<Position>0.006760000000000016 -0.0067600000000000993 -0.016749999999999987</Position>
+<Axis>0 0 -1.0000000000000002</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Servo-Disc-15</Uid>
+</InstancePath>
+<Position>0 0 0</Position>
+<Axis>-1.0000000000000002 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<UnknownConstraint name="ProfileCenter5">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Servo-link-link_MX-64T-2</Uid>
+</InstancePath>
+<Position>-0.022499999999999964 0.030000000000000054 0.00050000000000000044</Position>
+<Axis>0 0 1.0000000000000002</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Servo-Disc-15</Uid>
+</InstancePath>
+<Position>0.0020000000000000018 0 0</Position>
+<Axis>1.0000000000000002 0 0</Axis>
+</ConstraintGeometry>
+</UnknownConstraint>
+<Coincident name="Coincident152">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>MX-64T-2</Uid>
+</InstancePath>
+<Position>0.010999999999999982 -0.045300000000000007 -0.017000000000003235</Position>
+<Axis>0 0 -1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-link-link_MX-64T-2</Uid>
+</InstancePath>
+<Position>-0.021499999999999964 0.0040000000000000036 -0.0044999999999999485</Position>
+<Axis>-0.99999999999999989 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident153">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>MX-64T-2</Uid>
+</InstancePath>
+<Position>-0.01100000000000001 -0.045300000000000007 -0.017000000000003235</Position>
+<Axis>0 0 -1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-link-link_MX-64T-2</Uid>
+</InstancePath>
+<Position>-0.021499999999999964 0.025999999999999995 -0.0045000000000000595</Position>
+<Axis>-0.99999999999999989 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Concentric name="Concentric26">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>MX-64T-2</Uid>
+</InstancePath>
+<Position>0 0 -0.019799999999996681</Position>
+<Axis>0 0 -1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Servo-Disc-17</Uid>
+</InstancePath>
+<Position>0.001999999999999974 0 0</Position>
+<Axis>-1 -1.3877787807814457e-16 1.1102230246251565e-16</Axis>
+</ConstraintGeometry>
+</Concentric>
+<Coincident name="Coincident157">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>MX-64T-2</Uid>
+</InstancePath>
+<Position>-0.013520000000000004 -0.042010000000000047 -0.02049999999999999</Position>
+<Axis>0 0 -1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Servo-Disc-17</Uid>
+</InstancePath>
+<Position>0 0 0</Position>
+<Axis>-1 -1.3877787807814457e-16 1.1102230246251565e-16</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Concentric name="Concentric27">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>MX-64T-2</Uid>
+</InstancePath>
+<Position>0 0 0.028000000000003356</Position>
+<Axis>6.106226635438361e-16 0 -1.0000000000000002</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Servo-Disc-16</Uid>
+</InstancePath>
+<Position>0.0020000000000000018 0 0</Position>
+<Axis>-1 0 0</Axis>
+</ConstraintGeometry>
+</Concentric>
+<Coincident name="Coincident159">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>MX-64T-2</Uid>
+</InstancePath>
+<Position>0 0 0.025300000000003264</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Servo-Disc-16</Uid>
+</InstancePath>
+<Position>0 0 0</Position>
+<Axis>-1 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident160">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Servo-Disc-16</Uid>
+</InstancePath>
+<Position>0.001999999999999974 0 0.0095000000000000084</Position>
+<Axis>-1 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-disc-link_MX-64T-2</Uid>
+</InstancePath>
+<Position>0.028500000000000025 0.012499999999999956 -0.028500000000000025</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident161">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-Disc-16</Uid>
+</InstancePath>
+<Position>0.0020000000000000018 -0.0095000000000000639 0</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-disc-link_MX-64T-2</Uid>
+</InstancePath>
+<Position>0.028500000000000081 0.0030000000000000027 -0.038000000000000034</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident162">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Servo-Disc-17</Uid>
+</InstancePath>
+<Position>0.0020000000000000018 0 0.0095000000000000084</Position>
+<Axis>-1 -1.3877787807814457e-16 1.1102230246251565e-16</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-disc-link_MX-64T-2</Uid>
+</InstancePath>
+<Position>-0.022499999999999937 0.012500000000000011 -0.028500000000000025</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident164">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>MX-28T-2</Uid>
+</InstancePath>
+<Position>0.015000000000000013 -0.012500000000000011 0.01500000000000401</Position>
+<Axis>0 0 -1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>MX-28T-Link-1</Uid>
+</InstancePath>
+<Position>0.0044999999999999762 0.0010000000000000009 0</Position>
+<Axis>0 1.0000000000000002 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident178">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-disc-link_MX-64T-2</Uid>
+</InstancePath>
+<Position>-0.013499999999999956 0.020000000000000018 0.00049999999999994493</Position>
+<Axis>0 0 0.99999999999999978</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Link-plate-3</Uid>
+</InstancePath>
+<Position>0.016999999999999987 0.0074999999999999512 0.00099999999999994538</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident179">
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-disc-link_MX-64T-2</Uid>
+</InstancePath>
+<Position>0.020500000000000046 0.019999999999999962 0.00050000000000005596</Position>
+<Axis>0 0 0.99999999999999978</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Link-plate-3</Uid>
+</InstancePath>
+<Position>-0.017000000000000015 0.0074999999999999512 0.0010000000000000009</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident181">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>MX-28T-5</Uid>
+</InstancePath>
+<Position>-0.011127999999999916 -0.032269999999999993 -0.017749999999999932</Position>
+<Axis>0 0 -1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Link-plate-3</Uid>
+</InstancePath>
+<Position>0 0 0</Position>
+<Axis>0 0 -1</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident183">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>MX-28T-5</Uid>
+</InstancePath>
+<Position>0.017799999999999983 -0.033371999999999957 -0.010409999999999975</Position>
+<Axis>1.0000000000000002 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="line">
+<InstancePath>
+<Uid>Link-plate-3</Uid>
+</InstancePath>
+<Position>-0.021500000000000019 -0.012500000000000011 0</Position>
+<Axis>1.0000000000000002 0 1.1102230246251565e-16</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Concentric name="Concentric35">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>MX-28T-5</Uid>
+</InstancePath>
+<Position>0 0 0.017750000000000099</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Servo-Disc-20</Uid>
+</InstancePath>
+<Position>0.0020000000000000573 0 0</Position>
+<Axis>-1 0 0</Axis>
+</ConstraintGeometry>
+</Concentric>
+<Coincident name="Coincident185">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>MX-28T-5</Uid>
+</InstancePath>
+<Position>-0.0029640000000000222 -0.002970176758746973 0.022600000000000037</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="circle">
+<InstancePath>
+<Uid>Servo-Disc-20</Uid>
+</InstancePath>
+<Position>0.0020000000000000573 0 0</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident188">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>MX-28T-5</Uid>
+</InstancePath>
+<Position>-0.013207999999999942 -0.038599999999999968 -0.010409999999999919</Position>
+<Axis>0 -1.0000000000000002 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="line">
+<InstancePath>
+<Uid>Link-plate-3</Uid>
+</InstancePath>
+<Position>0.022499999999999964 -0.011500000000000066 0.00099999999999994538</Position>
+<Axis>0 1.0000000000000004 1.1102230246251565e-16</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident189">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Servo-Disc-20</Uid>
+</InstancePath>
+<Position>0.0020000000000000573 0 0</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>connection plate m28-1</Uid>
+</InstancePath>
+<Position>-0.045556217810725358 0.008195983069501811 0.023610539370142181</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Concentric name="Concentric36">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Servo-Disc-20</Uid>
+</InstancePath>
+<Position>0.0020000000000000295 0.0095000000000000084 0</Position>
+<Axis>-1 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>connection plate m28-1</Uid>
+</InstancePath>
+<Position>-0.046556217810725331 0.0024134974907740192 -0.0071719462085855779</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+</Concentric>
+<Concentric name="Concentric37">
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>Servo-Disc-20</Uid>
+</InstancePath>
+<Position>0.0020000000000000295 -0.0067175144212721638 -0.0067175144212721916</Position>
+<Axis>-1 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="cylinder">
+<InstancePath>
+<Uid>connection plate m28-1</Uid>
+</InstancePath>
+<Position>-0.046556217810725331 -0.013804016930498098 -0.013889460629857797</Position>
+<Axis>1 0 0</Axis>
+</ConstraintGeometry>
+</Concentric>
+<Coincident name="Coincident190">
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>Servo-link-link_MX-28T-1</Uid>
+</InstancePath>
+<Position>-0.02250000000000002 0.029999999999999999 0.00050000000000000044</Position>
+<Axis>0 0 1</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="plane">
+<InstancePath>
+<Uid>connection plate m28-1</Uid>
+</InstancePath>
+<Position>-0.046556217810725331 0.0081959830695018665 0.023610539370142236</Position>
+<Axis>-1 0 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident192">
+<ConstraintGeometry geomType="line">
+<InstancePath>
+<Uid>Servo-link-link_MX-28T-1</Uid>
+</InstancePath>
+<Position>-0.020500000000000018 0.029999999999999999 0.00050000000000005596</Position>
+<Axis>0 -1 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="line">
+<InstancePath>
+<Uid>connection plate m28-1</Uid>
+</InstancePath>
+<Position>-0.046556217810725359 0.008195983069501811 -0.016389460629857799</Position>
+<Axis>0 0 0.99999999999999978</Axis>
+</ConstraintGeometry>
+</Coincident>
+<Coincident name="Coincident193">
+<ConstraintGeometry geomType="line">
+<InstancePath>
+<Uid>Servo-link-link_MX-28T-1</Uid>
+</InstancePath>
+<Position>-0.020499999999999907 0 0.00050000000000005596</Position>
+<Axis>1.0000000000000002 0 0</Axis>
+</ConstraintGeometry>
+<ConstraintGeometry geomType="line">
+<InstancePath>
+<Uid>connection plate m28-1</Uid>
+</InstancePath>
+<Position>-0.046556217810725331 0.008195983069501811 0.0014295481798676235</Position>
+<Axis>0 -1 0</Axis>
+</ConstraintGeometry>
+</Coincident>
+</Constraints>
+</RootAssembly>
+<Assemblies>
+</Assemblies>
+<Parts>
+<Part name="Base" uid="Base*:*Default" version="166">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="Base.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.65593512237157114</Mass>
+<CenterOfMass>0 -0.0052418387143947425 -0.0019384500945807707</CenterOfMass>
+<Inertia>0.0020127951810780306 0.0032512643974183307 0.0020523099399021643 1.3022472320755898e-05 0 0</Inertia>
+</MassProperties>
+<GeometryFile name="Base_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Diffuse r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Specular r="0.44901960784313727" g="0.45882352941176469" b="0.46470588235294119" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.3125</Shininess>
+</VisualProperties>
+</Part>
+<Part name="Base-disc" uid="Base-disc*:*Default" version="145">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="Base-disc.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.02549027081513934</Mass>
+<CenterOfMass>0 0.00050000000000000001 0</CenterOfMass>
+<Inertia>1.9378030830698146e-05 3.8748477390903991e-05 1.9374690925008305e-05 0 0 0</Inertia>
+</MassProperties>
+<GeometryFile name="Base-disc_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Diffuse r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Specular r="0.44901960784313727" g="0.45882352941176469" b="0.46470588235294119" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.3125</Shininess>
+</VisualProperties>
+</Part>
+<Part name="Finger" uid="Finger*:*Default" version="174">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="Finger.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.017333014466805723</Mass>
+<CenterOfMass>0.0038602206826003041 0.012500000000000035 0.036961667661683774</CenterOfMass>
+<Inertia>1.5301194404128678e-05 1.6243965563469911e-05 2.7145027633219589e-06 0 2.6954817954550405e-06 0</Inertia>
+</MassProperties>
+<GeometryFile name="Finger_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Diffuse r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Specular r="0.44901960784313727" g="0.45882352941176469" b="0.46470588235294119" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.3125</Shininess>
+</VisualProperties>
+</Part>
+<Part name="Link-1" uid="Link-1*:*Default" version="210">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="Link-1.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.022790628547627811</Mass>
+<CenterOfMass>0 0.0076331491587331348 0.00083741329602527218</CenterOfMass>
+<Inertia>4.2813278852128879e-05 4.4610484991882451e-05 4.2657981347236635e-06 1.5264625291903506e-08 0 0</Inertia>
+</MassProperties>
+<GeometryFile name="Link-1_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Diffuse r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Specular r="0.44901960784313727" g="0.45882352941176469" b="0.46470588235294119" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.3125</Shininess>
+</VisualProperties>
+</Part>
+<Part name="Link-2" uid="Link-2*:*Default" version="245">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="Link-2.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.013346673572331715</Mass>
+<CenterOfMass>0 0.0084412399976342856 0.00019066099396354168</CenterOfMass>
+<Inertia>8.0927443325287365e-06 9.3033608525781978e-06 2.7965003584432761e-06 4.0916240890220084e-09 0 0</Inertia>
+</MassProperties>
+<GeometryFile name="Link-2_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Diffuse r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Specular r="0.44901960784313727" g="0.45882352941176469" b="0.46470588235294119" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.3125</Shininess>
+</VisualProperties>
+</Part>
+<Part name="Link-plate" uid="Link-plate*:*Default" version="124">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="Link-plate.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.0028825008972002274</Mass>
+<CenterOfMass>0 0 0.00050000000000000001</CenterOfMass>
+<Inertia>1.4941972597400322e-07 4.8188568106851431e-07 6.3082499022631754e-07 0 0 0</Inertia>
+</MassProperties>
+<GeometryFile name="Link-plate_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Diffuse r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Specular r="0.44901960784313727" g="0.45882352941176469" b="0.46470588235294119" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.3125</Shininess>
+</VisualProperties>
+</Part>
+<Part name="MX-106T" uid="MX-106T*:*Default" version="103">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="MX-106T.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.19561170999999999</Mass>
+<CenterOfMass>3.6294547203052311e-06 -0.015728033898397709 0.00046041747606699097</CenterOfMass>
+<Inertia>9.353676381074006e-05 5.2149211406744044e-05 7.3933306729302193e-05 -2.4036217245456804e-06 5.2267768495909148e-09 -3.7129011812466664e-09</Inertia>
+</MassProperties>
+<GeometryFile name="MX-106T_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.058823529411764705" g="0.058823529411764705" b="0.058823529411764705" a="1"/>
+<Diffuse r="0.058823529411764705" g="0.058823529411764705" b="0.058823529411764705" a="1"/>
+<Specular r="0.029411764705882353" g="0.029411764705882353" b="0.029411764705882353" a="1"/>
+<Emissive r="4.3826944320434019e-11" g="4.3826944320434019e-11" b="4.3826944320434019e-11" a="1"/>
+<Shininess>0.40000000596046448</Shininess>
+</VisualProperties>
+</Part>
+<Part name="MX-28T" uid="MX-28T*:*Default" version="106">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="MX-28T.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.096388378599999991</Mass>
+<CenterOfMass>-4.9207660184937118e-09 -0.011515527780961547 -3.1786961811860269e-05</CenterOfMass>
+<Inertia>2.7164585570374297e-05 1.6677802875978787e-05 2.3015011739517364e-05 -4.071722230813414e-07 1.1831857898853264e-11 6.3971751373782056e-13</Inertia>
+</MassProperties>
+<GeometryFile name="MX-28T_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.058823529411764705" g="0.058823529411764705" b="0.058823529411764705" a="1"/>
+<Diffuse r="0.058823529411764705" g="0.058823529411764705" b="0.058823529411764705" a="1"/>
+<Specular r="0.029411764705882353" g="0.029411764705882353" b="0.029411764705882353" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.40000000596046448</Shininess>
+</VisualProperties>
+</Part>
+<Part name="MX-28T-Link" uid="MX-28T-Link*:*Default" version="136">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="MX-28T-Link.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.0012738283478637804</Mass>
+<CenterOfMass>0 0.00050000000000000001 0</CenterOfMass>
+<Inertia>1.5484005933923633e-07 1.7200066357832686e-07 1.7372908963734523e-08 0 0 0</Inertia>
+</MassProperties>
+<GeometryFile name="MX-28T-Link_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Diffuse r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Specular r="0.44901960784313727" g="0.45882352941176469" b="0.46470588235294119" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.3125</Shininess>
+</VisualProperties>
+</Part>
+<Part name="MX-64T" uid="MX-64T*:*Default" version="103">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="MX-64T.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.17009713900000001</Mass>
+<CenterOfMass>1.1288218934808353e-11 -0.015203481847325203 0.0004522569386128018</CenterOfMass>
+<Inertia>7.0095398659614366e-05 3.984645342901137e-05 5.8501037407669086e-05 -2.0688024459748725e-06 4.7677246070726803e-14 -9.3378993115599097e-13</Inertia>
+</MassProperties>
+<GeometryFile name="MX-64T_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.058823529411764705" g="0.058823529411764705" b="0.058823529411764705" a="1"/>
+<Diffuse r="0.058823529411764705" g="0.058823529411764705" b="0.058823529411764705" a="1"/>
+<Specular r="0.029411764705882353" g="0.029411764705882353" b="0.029411764705882353" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.40000000596046448</Shininess>
+</VisualProperties>
+</Part>
+<Part name="Servo-Disc" uid="Servo-Disc*:*Default" version="144">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="Servo-Disc.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.0022669635214453581</Mass>
+<CenterOfMass>0.00097661436740035124 0 0</CenterOfMass>
+<Inertia>1.9199819105797385e-07 9.6747602260681152e-08 9.6747602260681165e-08 0 0 0</Inertia>
+</MassProperties>
+<GeometryFile name="Servo-Disc_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Diffuse r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Specular r="0.44901960784313727" g="0.45882352941176469" b="0.46470588235294119" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.3125</Shininess>
+</VisualProperties>
+</Part>
+<Part name="Servo-disc-link_MX-106T" uid="Servo-disc-link_MX-106T*:*Default" version="245">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="Servo-disc-link_MX-106T.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.0086440413403225096</Mass>
+<CenterOfMass>0.0061500000000000834 0.012499999999999997 -0.010526227736498393</CenterOfMass>
+<Inertia>1.7786292104403505e-06 6.184871799733648e-06 5.3446742483731506e-06 0 0 0</Inertia>
+</MassProperties>
+<GeometryFile name="Servo-disc-link_MX-106T_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Diffuse r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Specular r="0.44901960784313727" g="0.45882352941176469" b="0.46470588235294119" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.3125</Shininess>
+</VisualProperties>
+</Part>
+<Part name="Servo-disc-link_MX-28T" uid="Servo-disc-link_MX-28T*:*Default" version="285">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="Servo-disc-link_MX-28T.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.0077785778411459628</Mass>
+<CenterOfMass>-0.00057499999999994003 0.012499999999999994 -0.011697401449226401</CenterOfMass>
+<Inertia>1.6268186003975957e-06 3.8970317287224717e-06 3.1182960071232571e-06 0 0 0</Inertia>
+</MassProperties>
+<GeometryFile name="Servo-disc-link_MX-28T_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Diffuse r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Specular r="0.44901960784313727" g="0.45882352941176469" b="0.46470588235294119" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.3125</Shininess>
+</VisualProperties>
+</Part>
+<Part name="Servo-disc-link_MX-64T" uid="Servo-disc-link_MX-64T*:*Default" version="257">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="Servo-disc-link_MX-64T.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.0082862913403225109</Mass>
+<CenterOfMass>0.0035000000000000903 0.012500000000000002 -0.010980684117292958</CenterOfMass>
+<Inertia>1.718615986679609e-06 5.1868693418407792e-06 4.3694193892410215e-06 0 0 0</Inertia>
+</MassProperties>
+<GeometryFile name="Servo-disc-link_MX-64T_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Diffuse r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Specular r="0.44901960784313727" g="0.45882352941176469" b="0.46470588235294119" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.3125</Shininess>
+</VisualProperties>
+</Part>
+<Part name="Servo-link-link_MX-106T" uid="Servo-link-link_MX-106T*:*Default" version="354">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="Servo-link-link_MX-106T.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.0039095056304818522</Mass>
+<CenterOfMass>-0.0044999999999999303 0.014999999999999996 -0.0011203296524595068</CenterOfMass>
+<Inertia>3.0822167961157938e-07 6.4706292001102062e-07 9.2163407867759507e-07 0 0 0</Inertia>
+</MassProperties>
+<GeometryFile name="Servo-link-link_MX-106T_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Diffuse r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Specular r="0.44901960784313727" g="0.45882352941176469" b="0.46470588235294119" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.3125</Shininess>
+</VisualProperties>
+</Part>
+<Part name="Servo-link-link_MX-28T" uid="Servo-link-link_MX-28T*:*Default" version="386">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="Servo-link-link_MX-28T.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.0035855056304818504</Mass>
+<CenterOfMass>-0.0064999999999999346 0.015000000000000001 -0.0012215669240763689</CenterOfMass>
+<Inertia>2.8011136124393929e-07 4.8613480307392081e-07 7.3353646872843943e-07 0 0 0</Inertia>
+</MassProperties>
+<GeometryFile name="Servo-link-link_MX-28T_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Diffuse r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Specular r="0.44901960784313727" g="0.45882352941176469" b="0.46470588235294119" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.3125</Shininess>
+</VisualProperties>
+</Part>
+<Part name="Servo-link-link_MX-64T" uid="Servo-link-link_MX-64T*:*Default" version="357">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="Servo-link-link_MX-64T.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.0039095056304818522</Mass>
+<CenterOfMass>-0.0044999999999999303 0.014999999999999996 -0.0011203296524595068</CenterOfMass>
+<Inertia>3.0822167961157938e-07 6.4706292001102062e-07 9.2163407867759517e-07 0 0 0</Inertia>
+</MassProperties>
+<GeometryFile name="Servo-link-link_MX-64T_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Diffuse r="0.89803921568627454" g="0.91764705882352937" b="0.92941176470588238" a="1"/>
+<Specular r="0.44901960784313727" g="0.45882352941176469" b="0.46470588235294119" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.3125</Shininess>
+</VisualProperties>
+</Part>
+<Part name="connection plate m28" uid="connection plate m28*:*Default" version="106">
+<ModelUnits mass="kilogram" length="millimeter"/>
+<PartFile name="connection plate m28.SLDPRT" type="SolidWorks Part"/>
+<MassProperties>
+<Mass>0.00092909911555884609</Mass>
+<CenterOfMass>-0.04605621781072531 -0.0043040169304981411 -0.0061156710991757133</CenterOfMass>
+<Inertia>8.0088948108898295e-08 2.2092608617060983e-08 5.8151189344430489e-08 0 0 0</Inertia>
+</MassProperties>
+<GeometryFile name="connection plate m28_Default_sldprt.STEP" type="STEP"/>
+<VisualProperties>
+<Ambient r="0.792156862745098" g="0.81960784313725488" b="0.93333333333333335" a="1"/>
+<Diffuse r="0.792156862745098" g="0.81960784313725488" b="0.93333333333333335" a="1"/>
+<Specular r="0.396078431372549" g="0.40980392156862744" b="0.46666666666666667" a="1"/>
+<Emissive r="0" g="0" b="0" a="1"/>
+<Shininess>0.3125</Shininess>
+</VisualProperties>
+</Part>
+</Parts>
+</SimscapeMultibodyImportXML>

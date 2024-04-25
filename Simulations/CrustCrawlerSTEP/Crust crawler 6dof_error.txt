@@ -1,0 +1,8 @@
+Constrained Instances: 'Servo-Disc-14', 'Link-plate-2'
+Constraint Name: ProfileCenter2
+Error Details: Constraint is not supported. The constraint has been exported as unknown constraint.
+---------------------------------------------------------------------------------
+Constrained Instances: 'Servo-link-link_MX-64T-2', 'Servo-Disc-15'
+Constraint Name: ProfileCenter5
+Error Details: Constraint is not supported. The constraint has been exported as unknown constraint.
+---------------------------------------------------------------------------------
