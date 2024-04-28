@@ -1,25 +1,25 @@
 clear all
 clc
 
-t = pi;
+p = pi;
 
 % Joint positions
-t1 = t;
-t2 = t;
-t3 = t;
-t4 = t;
-t5 = t;
-t6 = t;
+t1 = p;
+t2 = p;
+t3 = p;
+t4 = p;
+t5 = p;
+t6 = p;
 
 q = [t1; t2; t3; t4; t5; t6];
 
 % % Joint velocities
-td1 = t;
-td2 = t;
-td3 = t;
-td4 = t;
-td5 = t;
-td6 = t;
+td1 = p;
+td2 = p;
+td3 = p;
+td4 = p;
+td5 = p;
+td6 = p;
 
 qd = [td1; td2; td3; td4; td5; td6];
 
