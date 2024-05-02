@@ -4,7 +4,7 @@ clc
 % Joint positions
 t1 = 0;
 t2 = 0;
-t3 = pi/2;
+t3 = pi;
 t4 = 0;
 t5 = 0;
 t6 = 0;
