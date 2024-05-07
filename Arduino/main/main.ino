@@ -107,16 +107,7 @@ void setup() {
 
     //Serial.println(dxl.readControlTableItem(BAUD_RATE, M[i]->ID));
     dxl.setOperatingMode(M[i]->ID, OP_PWM);
-    // Timing tests
-    // Serial.println(millis());
-    // dxl.getPresentPosition(M[i]->ID);
-    // Serial.println(millis());
-    // dxl.readControlTableItem(PRESENT_POSITION, M[i]->ID);
-    // Serial.println(millis());
-    // dxl.DYNAMIXEL::Master::read(M[i]->ID, 8, 1, (uint8_t*)&ret, sizeof(ret));
-    // Serial.println(ret);
-    // Serial.println(millis());
-    // Serial.println();
+    
 
     dxl.torqueOn(M[i]->ID);
   }
