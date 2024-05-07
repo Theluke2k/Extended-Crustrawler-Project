@@ -103,12 +103,17 @@ void setup() {
     Serial.println(dxl.ping(M[i]->ID));
 
     dxl.torqueOff(M[i]->ID);
-    //dxl.writeControlTableItem((uint8_t)RETURN_DELAY_TIME, (uint8_t)M[i]->ID, (int32_t)100);
+    dxl.writeControlTableItem((uint8_t)RETURN_DELAY_TIME, (uint8_t)M[i]->ID, (int32_t)30);
 
     //Serial.println(dxl.readControlTableItem(BAUD_RATE, M[i]->ID));
     dxl.setOperatingMode(M[i]->ID, OP_PWM);
-    
 
+    // Print info
+    Serial.print("Motor");
+    Serial.println(i);
+    Serial.println(dxl.readControlTableItem((uint8_t)OPERATING_MODE, (uint8_t)M[i]->ID, (uint32_t)4));
+    Serial.println(dxl.readControlTableItem((uint8_t)RETURN_DELAY_TIME, (uint8_t)M[i]->ID, (uint32_t)4));
+    
     dxl.torqueOn(M[i]->ID);
   }
 
@@ -129,6 +134,7 @@ void getMotorState(Motor* M) {
   // Converted from RAW unit to rad
   //M->state.q = ((dxl.getPresentPosition(M->ID, UNIT_RAW) + M->offset) / 4096.0) * 2 * PI;
   x = ((dxl.readControlTableItem((uint8_t)PRESENT_POSITION, M->ID, 10) + M->offset) / 4096.0) * 2 * PI;
+  Serial.println(x);
   if(abs(x - M->state.q) < 10) {
     M->state.q = x;
   }
@@ -137,7 +143,7 @@ void getMotorState(Motor* M) {
   // Converted from RAW units to rad/s
   //M->state.qd = ((dxl.getPresentVelocity(M->ID, UNIT_RAW) * 0.229) / 60.0) * 2.0 * PI;
   x = ((dxl.readControlTableItem((uint8_t)PRESENT_VELOCITY, M->ID, 10) * 0.229) / 60.0) * 2.0 * PI;
-
+  Serial.println(x);
   if(abs(x - M->state.qd) < 10) {
     M->state.qd = x;
   }
@@ -249,8 +255,8 @@ void ControlTask(void* pvParameters) {
   TickType_t lastWakeTime = xTaskGetTickCount();
 
   // Controller Parameters
-  double w_n[6] = { 15, 15, 15, 17, 15, 17 };  // natural frequency of system
-  double z_n[6] = { 1, 1, 1, 1, 1, 1 };  // damping ratio of system
+  double w_n[6] = { 15, 20, 20, 17, 15, 17 };  // natural frequency of system
+  double z_n[6] = { 1.2, 1.2, 1.2, 1.2, 1.2, 1.2 };  // damping ratio of system
 
   // General Variables
   double timeCapture = 0;
@@ -299,7 +305,6 @@ void ControlTask(void* pvParameters) {
   
     // Read position and velocity of the motor
     updateMotorState(M);
-    Serial.println(millis() - duration);
     if (inMotionFlag) {
       // Insert motor state in vector
       q = getCurrentPositionVector(M);
@@ -461,7 +466,7 @@ void ControlTask(void* pvParameters) {
       }
       Serial.println();*/
 
-      //Serial << "tau: " << tau << '\n';
+      Serial << "tau: " << tau << '\n';
 
       // Convert torques to PWM using velocity feedback
       getPWM(tau);
@@ -469,17 +474,17 @@ void ControlTask(void* pvParameters) {
       // Write PWM to motors
       for (int i = 0; i < 6; i++) {
         //dxl.setGoalPWM(M[i]->ID, M[i]->PWM);
-        //dxl.writeControlTableItem((uint8_t)GOAL_PWM, (uint8_t)M[i]->ID, (int32_t)M[i]->PWM, (uint32_t)10);
+        //dxl.writeControlTableItem((uint8_t)GOAL_PWM, (uint8_t)M[i]->ID, (int32_t)M[i]->PWM, (uint32_t)4);
       }
       xSemaphoreGive(motorComms);
     }
 
-    
+    Serial.println(millis() - duration);
 
 
     Serial.println();
 
-    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(45));
+    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(30));
   }
 }
 
