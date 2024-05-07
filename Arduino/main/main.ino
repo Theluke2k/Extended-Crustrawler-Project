@@ -96,17 +96,6 @@ void setup() {
 
   // Test used for time optimiation
   int32_t recv_len, ret = 0;
-/*
-  for (int j = 0; j < 100; j++) {
-    for (int i = 0; i < 6; i++) {
-      Serial.print("Ping: ");
-      Serial.println(millis());
-      Serial.println(dxl.ping(M[i]->ID));
-      Serial.println(millis());
-      Serial.println();
-
-    }
-  }*/
 
   // Motor Setup
   for (int i = 0; i < 6; i++) {
@@ -114,7 +103,7 @@ void setup() {
     Serial.println(dxl.ping(M[i]->ID));
 
     dxl.torqueOff(M[i]->ID);
-    dxl.writeControlTableItem((uint8_t)RETURN_DELAY_TIME, (uint8_t)M[i]->ID, (int32_t)30);
+    //dxl.writeControlTableItem((uint8_t)RETURN_DELAY_TIME, (uint8_t)M[i]->ID, (int32_t)100);
 
     //Serial.println(dxl.readControlTableItem(BAUD_RATE, M[i]->ID));
     dxl.setOperatingMode(M[i]->ID, OP_PWM);
@@ -148,17 +137,17 @@ void getMotorState(Motor* M) {
   //Serial.println(((dxl.readControlTableItem((uint8_t)PRESENT_POSITION, M->ID) + M->offset) / 4096.0) * 2 * PI);
   // Converted from RAW unit to rad
   //M->state.q = ((dxl.getPresentPosition(M->ID, UNIT_RAW) + M->offset) / 4096.0) * 2 * PI;
-  x = ((dxl.readControlTableItem((uint8_t)PRESENT_POSITION, M->ID, 4) + M->offset) / 4096.0) * 2 * PI;
-  if(abs(x - M->state.q) < 2) {
+  x = ((dxl.readControlTableItem((uint8_t)PRESENT_POSITION, M->ID, 10) + M->offset) / 4096.0) * 2 * PI;
+  if(abs(x - M->state.q) < 10) {
     M->state.q = x;
   }
 
   //Serial.println(((dxl.readControlTableItem((uint8_t)PRESENT_VELOCITY, M->ID, 4) * 0.229) / 60.0) * 2.0 * PI);
   // Converted from RAW units to rad/s
   //M->state.qd = ((dxl.getPresentVelocity(M->ID, UNIT_RAW) * 0.229) / 60.0) * 2.0 * PI;
-  x = ((dxl.readControlTableItem((uint8_t)PRESENT_VELOCITY, M->ID, 4) * 0.229) / 60.0) * 2.0 * PI;
+  x = ((dxl.readControlTableItem((uint8_t)PRESENT_VELOCITY, M->ID, 10) * 0.229) / 60.0) * 2.0 * PI;
 
-  if(abs(x - M->state.qd) < 2) {
+  if(abs(x - M->state.qd) < 10) {
     M->state.qd = x;
   }
   xSemaphoreGive(motorComms);
@@ -269,8 +258,8 @@ void ControlTask(void* pvParameters) {
   TickType_t lastWakeTime = xTaskGetTickCount();
 
   // Controller Parameters
-  double w_n[6] = { 9, 20, 22, 17, 15, 10 };  // natural frequency of system
-  double z_n[6] = { 1, 1, 1, 1, 1, 1 };  // damping ratio of system
+  double w_n[6] = { 20, 20, 20, 15, 20, 20 };  // natural frequency of system
+  double z_n[6] = { 0.8, 0.8, 0.8, 0.8, 0.8, 0.8 };  // damping ratio of system
 
   // General Variables
   double timeCapture = 0;
@@ -316,6 +305,7 @@ void ControlTask(void* pvParameters) {
 
   while (1) {
     duration = millis();
+  
     // Read position and velocity of the motor
     updateMotorState(M);
     if (inMotionFlag) {
@@ -323,7 +313,7 @@ void ControlTask(void* pvParameters) {
       q = getCurrentPositionVector(M);
       qd = getCurrentVelocityVector(M);
 
-      Serial << "q: " << q << '\n';
+      //Serial << "q: " << q << '\n';
       //Serial << "qd: " << qd << '\n';
 
       // Define some structs for computational optimization
@@ -487,7 +477,7 @@ void ControlTask(void* pvParameters) {
       // Write PWM to motors
       for (int i = 0; i < 6; i++) {
         //dxl.setGoalPWM(M[i]->ID, M[i]->PWM);
-        dxl.writeControlTableItem((uint8_t)GOAL_PWM, (uint8_t)M[i]->ID, (int32_t)M[i]->PWM, (uint32_t)4);
+        dxl.writeControlTableItem((uint8_t)GOAL_PWM, (uint8_t)M[i]->ID, (int32_t)M[i]->PWM, (uint32_t)10);
       }
       xSemaphoreGive(motorComms);
     }
