@@ -62,7 +62,7 @@ double* motorConstants[] = { MX_28_Constants, MX_64_Constants, MX_106_Constants 
 */
 
 // Initialize motors with their IDs
-Motor M1(1, MX_64, -3043.0);
+Motor M1(1, MX_64, -1030.0);
 Motor M2(2, MX_106, -1029.0);
 Motor M3(3, MX_106, -942.0);
 Motor M4(4, MX_28, -978.0);
@@ -258,8 +258,8 @@ void ControlTask(void* pvParameters) {
   TickType_t lastWakeTime = xTaskGetTickCount();
 
   // Controller Parameters
-  double w_n[6] = { 20, 20, 20, 15, 20, 20 };  // natural frequency of system
-  double z_n[6] = { 0.8, 0.8, 0.8, 0.8, 0.8, 0.8 };  // damping ratio of system
+  double w_n[6] = { 15, 15, 15, 17, 15, 17 };  // natural frequency of system
+  double z_n[6] = { 1, 1, 1, 1, 1, 1 };  // damping ratio of system
 
   // General Variables
   double timeCapture = 0;
@@ -308,6 +308,7 @@ void ControlTask(void* pvParameters) {
   
     // Read position and velocity of the motor
     updateMotorState(M);
+    Serial.println(millis() - duration);
     if (inMotionFlag) {
       // Insert motor state in vector
       q = getCurrentPositionVector(M);
@@ -477,12 +478,12 @@ void ControlTask(void* pvParameters) {
       // Write PWM to motors
       for (int i = 0; i < 6; i++) {
         //dxl.setGoalPWM(M[i]->ID, M[i]->PWM);
-        dxl.writeControlTableItem((uint8_t)GOAL_PWM, (uint8_t)M[i]->ID, (int32_t)M[i]->PWM, (uint32_t)10);
+        //dxl.writeControlTableItem((uint8_t)GOAL_PWM, (uint8_t)M[i]->ID, (int32_t)M[i]->PWM, (uint32_t)10);
       }
       xSemaphoreGive(motorComms);
     }
 
-    Serial.println(millis() - duration);
+    
 
 
     Serial.println();
@@ -503,7 +504,7 @@ void TrajectoryPlanner(void* pvParameters) {
   updateMotorState(M);
 
   // Just for tests (replaced by user input later)
-  double times[100] = { 0, 10, 20 };
+  double times[100] = { 0, 4, 8 };
   double positions[100] = { 0, PI / 4, PI / 2 };
   double velocities[100] = { 0, 0, 0 };
 
