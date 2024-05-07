@@ -42,9 +42,10 @@ struct Motor {
   MotorState state;
   MotorState desiredState;
   MotorType type;
+  uint16_t model;
 
   // Constructor
-  Motor(uint8_t initID, MotorType initMotorType, int init_offset = 0) : ID(initID), type(initMotorType), offset(init_offset) {}
+  Motor(uint8_t initID, MotorType initMotorType, uint16_t initModel, int init_offset = 0) : ID(initID), type(initMotorType), model(initModel), offset(init_offset) {}
 };
 
 struct Pos {
