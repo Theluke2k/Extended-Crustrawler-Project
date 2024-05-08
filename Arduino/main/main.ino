@@ -116,7 +116,7 @@ void setup() {
     //Serial.println(micros() - x);
 
     dxl.torqueOff(M[i]->ID);
-    dxl.writeControlTableItem((uint8_t)RETURN_DELAY_TIME, (uint8_t)M[i]->ID, (int32_t)100, motorTimeout);
+    dxl.writeControlTableItem((uint8_t)RETURN_DELAY_TIME, (uint8_t)M[i]->ID, (int32_t)80, motorTimeout);
 
     //Serial.println(dxl.readControlTableItem(BAUD_RATE, M[i]->ID));
     dxl.setOperatingMode(M[i]->ID, OP_PWM);
@@ -289,7 +289,7 @@ void ControlTask(void* pvParameters) {
   TickType_t lastWakeTime = xTaskGetTickCount();
 
   // Controller Parameters
-  double w_n[6] = { 15, 17, 17, 17, 15, 17 };              // natural frequency of system
+  double w_n[6] = { 17, 20, 20, 17, 15, 17 };              // natural frequency of system
   double z_n[6] = { 1.05, 1.05, 1.05, 1.05, 1.05, 1.05 };  // damping ratio of system
 
   // General Variables
