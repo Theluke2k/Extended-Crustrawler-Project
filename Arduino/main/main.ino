@@ -52,6 +52,8 @@ double MX_28_Constants[4] = { 211.7, 427.4, 642.0, 115.3 };
 double MX_64_Constants[4] = { 80.9, 152.7, 224.5, 105.3 };
 double MX_106_Constants[4] = { 40.4, 83.9, 127.5, 160.6 };
 double* motorConstants[] = { MX_28_Constants, MX_64_Constants, MX_106_Constants };
+float userInput[100][6] = { 0 };
+
 
 /*
   Motor 1: 1030, 1
@@ -272,13 +274,62 @@ void getPWM(BLA::Matrix<6> tau) {
       pwm_test = -885;
     }
 
-    M[i]->PWM = pwm_test;
+    M[i]->input = pwm_test;
   }
 }
 
-void updateMotorInput() {
-}
+void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
+  double C1, C2 = 0;
+  int motorType = 0;
+  double input_test = 0;
 
+  for (int i = 0; i < 6; i++) {
+    // Do nothing if a timeout was indicated
+    if (!timeoutFlag) {
+      // Chech the operating mode of the motor
+      if (M[i]->mode == OP_CURRENT) {
+        if (M[i]->type == MX_106) {
+          M[i]->input = tau(i) * 133.33;
+        } else if (M[i]->type == MX_64) {
+          M[i]->input = tau(i) * 172.41;
+        } else if (M[i]->type == MX_28) {
+          Serial.println("INVALID MOTOR TYPE FOR CURRENT CONTROL");
+        }
+
+        // Write new current value to the motor
+        xSemaphoreTake(motorComms, 1000);
+        dxl.writeControlTableItem((uint8_t)GOAL_CURRENT, (uint8_t)M[i]->ID, (int32_t)M[i]->input, motorTimeout);
+        xSemaphoreGive(motorComms);
+      } else if (M[i]->mode == OP_PWM) {
+        /*
+          if: opposed by gravity.
+          else if: assisted by gravity.
+          else: not affected by gravity.
+        */
+        if (((tau(i) < 0) && (g(i) < 0)) || ((tau(i) > 0) && (g(i) > 0))) {
+          input_test = tau(i) * motorConstants[motorType][2] + M[i]->state.qd * motorConstants[motorType][3];
+        } else if (((tau(i) < 0) && (g(i) > 0)) || ((tau(i) > 0) && (g(i) < 0))) {
+          input_test = tau(i) * motorConstants[motorType][0] + M[i]->state.qd * motorConstants[motorType][3];
+        } else {
+          input_test = tau(i) * motorConstants[motorType][1] + M[i]->state.qd * motorConstants[motorType][3];
+        }
+
+        // Limit the PWM value
+        if (input_test > 885) {
+          input_test = 885;
+        }
+        if (input_test < -855) {
+          input_test = -885;
+        }
+
+        // Write the new PWM value to the motor
+        xSemaphoreTake(motorComms, 1000);
+        dxl.writeControlTableItem((uint8_t)GOAL_PWM, (uint8_t)M[i]->ID, (int32_t)M[i]->input, motorTimeout);
+        xSemaphoreGive(motorComms);
+      }
+    }
+  }
+}
 
 /* ----- UNUSED LOOP ----- */
 void loop() {
@@ -414,21 +465,9 @@ void ControlTask(void* pvParameters) {
 
       Serial << "tau: " << tau << '\n';
 
-      // Convert torques to PWM using velocity feedback
-      updateMotorInput();
+      // Update the motor input depending on the operating mode
+      updateMotorInput(tau, g);
 
-      /*
-      getPWM(tau);
-
-      // Write PWM to motors
-      for (int i = 0; i < 6; i++) {
-        if (!timeoutFlag) {
-          xSemaphoreTake(motorComms, 1000);
-          dxl.writeControlTableItem((uint8_t)GOAL_PWM, (uint8_t)M[i]->ID, (int32_t)M[i]->PWM, motorTimeout);
-          xSemaphoreGive(motorComms);
-        }
-      }
-      */
     } else {
       Serial.println("TIMEOUT DETECTED");
     }
@@ -438,6 +477,61 @@ void ControlTask(void* pvParameters) {
 
     vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(30));
   }
+}
+
+bool UserInputListener() {
+  if (Serial.available() > 0) {
+    String input = Serial.readStringUntil('\n');
+    input.trim();
+
+    int arrayIndex, innerIndex, startIndex = 0;
+    bool lastCharWasSpace = true;
+
+    for (int i = 0; i <= input.length(); i++) {
+      // Check if we have reached the end of a number or the end of the input
+      if (i == input.length() || input.charAt(i) == ' ') {
+        // Ensures that it still works if the user types more than 1 space between numbers
+        if (!lastCharWasSpace) {
+          // Extract number from string and convert to float
+          String inputNumberString = input.substring(startIndex, i);
+          float inputNumber = inputNumberString.toFloat();
+
+          // Save number in userInput array
+          userInput[arrayIndex][innerIndex] = inputNumber;
+          // Increment index number
+          innerIndex++;
+
+          // If the end of a path point is reached, reset innerIndex and increment outer index
+          if (innerIndex >= 6) {
+            innerIndex = 0;
+            arrayIndex++;
+          }
+
+          lastCharWasSpace = true;
+        }
+      } else {
+        // Set startindex to i if the last characters was space
+        if (lastCharWasSpace) {
+          startIndex = i;
+        }
+        lastCharWasSpace = false;
+      }
+
+      // Break if user has input more than 100 via points
+      if (arrayIndex >= 100) {
+        break;
+      }
+    }
+    // Print to check if correct
+    for (int i = 0; i < arrayIndex; i++) {
+      for (int j = 0; j < 6; j++) {
+        Serial.println(userInput[i][j]);
+      }
+      Serial.println();
+    }
+    return 1;
+  }
+  return 0;
 }
 
 void TrajectoryPlanner(void* pvParameters) {
@@ -451,10 +545,27 @@ void TrajectoryPlanner(void* pvParameters) {
   // If not already updated
   updateMotorState(M);
 
-  // Just for tests (replaced by user input later)
-  double times[100] = { 0, 5, 10 };
-  double positions[100] = { 0, PI / 4, PI / 2 };
-  double velocities[100] = { 0, 0, 0 };
+  // Array to hold the joint space path points converted from the user input using inverse kinematics
+  float times[100] = { 0, 5, 10 };
+  float positions[100][6] = { 0 };
+  float velocities[100][6] = { 0 };
+
+  // Initialize some inputs for tests
+  // First point
+  positions[1][0] = PI / 4;
+  positions[1][1] = PI / 4;
+  positions[1][2] = PI / 4;
+  positions[1][3] = PI / 4;
+  positions[1][4] = PI / 4;
+  positions[1][5] = PI / 4;
+
+  // Second point
+  positions[2][0] = PI / 2;
+  positions[2][1] = PI / 2;
+  positions[2][2] = PI / 2;
+  positions[2][3] = PI / 2;
+  positions[2][4] = PI / 2;
+  positions[2][5] = PI / 2;
 
   // Initialize path points (this should be executed in runtime in reality)
   for (int i = 0; i < 6; i++) {
@@ -466,8 +577,8 @@ void TrajectoryPlanner(void* pvParameters) {
     // Set the rest of the path points
     for (int j = 1; j < Tr[i]->numberOfViaPoints; j++) {
       Tr[i]->times[j] = times[j] * 1000.0;
-      Tr[i]->positions[j] = positions[j];
-      Tr[i]->velocities[j] = velocities[j];
+      Tr[i]->positions[j] = positions[j][i];
+      Tr[i]->velocities[j] = velocities[j][i];
     }
   }
 

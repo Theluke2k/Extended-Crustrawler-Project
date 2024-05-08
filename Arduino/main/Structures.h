@@ -38,7 +38,7 @@ struct MotorState {
 struct Motor {
   uint8_t ID = 0;
   double offset = 0;
-  float PWM = 0;
+  float input = 0;
   MotorState state;
   MotorState desiredState;
   MotorType type;
