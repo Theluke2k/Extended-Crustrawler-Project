@@ -349,6 +349,7 @@ uint8_t UserInputListener() {
       if (input.charAt(i) == ',') {
         isPosition = 1;
         arrayIndex = 1;
+        innerIndex = 0;
       } else if (i == input.length() || input.charAt(i) == ' ') {
         // Ensures that it still works if the user types more than 1 space between numbers
         if (!lastCharWasSpace) {
@@ -386,14 +387,16 @@ uint8_t UserInputListener() {
       if (arrayIndex >= 100) {
         break;
       }
-      Serial.println("PRINT CHECK");
-      for (int i = 1; i < arrayIndex; i++) {
-        Serial.println(userTimes[i]);
-        for (int j = 0; j < 6; j++) {
-          Serial.println(userPositions[i][j]);
-        }
+    }
+    /*
+    Serial.println("PRINT CHECK");
+    for (int i = 1; i < arrayIndex; i++) {
+      Serial.println(userTimes[i]);
+      for (int j = 0; j < 6; j++) {
+        Serial.println(userPositions[i][j]);
       }
     }
+    */
     return 1;
   }
   return 0;
@@ -602,7 +605,7 @@ void TrajectoryPlanner(void* pvParameters) {
   while (1) {
     // Trajectory should only be updated if the manipualtor is not already executing a trajectory
     if (!inMotionFlag) {
-      if (UserInputListener()) {
+      if (UserInputListener()) { // format "time1 time2 , p11 p12 p13 o11 o12 o13 p21 p22 p23 o21 o22 o23"
         /*
         for (int i = 1; i < TR[1]->numberOfViaPoints) {
           // Convert user input orientation to rotation matrix and to joint space
