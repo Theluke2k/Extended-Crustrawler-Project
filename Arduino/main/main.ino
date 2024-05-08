@@ -331,6 +331,62 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
   }
 }
 
+bool UserInputListener() {
+  if (Serial.available() > 0) {
+    String input = Serial.readStringUntil('\n');
+    input.trim();
+
+    int innerIndex, startIndex = 0;
+    int arrayIndex = 1;
+    bool lastCharWasSpace = true;
+
+    for (int i = 0; i <= input.length(); i++) {
+      // Check if we have reached the end of a number or the end of the input
+      if (i == input.length() || input.charAt(i) == ' ') {
+        // Ensures that it still works if the user types more than 1 space between numbers
+        if (!lastCharWasSpace) {
+          // Extract number from string and convert to float
+          String inputNumberString = input.substring(startIndex, i);
+          float inputNumber = inputNumberString.toFloat();
+
+          // Save number in userInput array
+          userInput[arrayIndex][innerIndex] = inputNumber;
+          // Increment index number
+          innerIndex++;
+
+          // If the end of a path point is reached, reset innerIndex and increment outer index
+          if (innerIndex >= 6) {
+            innerIndex = 0;
+            arrayIndex++;
+          }
+
+          lastCharWasSpace = true;
+        }
+      } else {
+        // Set startindex to i if the last characters was space
+        if (lastCharWasSpace) {
+          startIndex = i;
+        }
+        lastCharWasSpace = false;
+      }
+
+      // Break if user has input more than 100 via points
+      if (arrayIndex >= 100) {
+        break;
+      }
+    }
+    // Print to check if correct
+    for (int i = 0; i < arrayIndex; i++) {
+      for (int j = 0; j < 6; j++) {
+        Serial.println(userInput[i][j]);
+      }
+      Serial.println();
+    }
+    return 1;
+  }
+  return 0;
+}
+
 /* ----- UNUSED LOOP ----- */
 void loop() {
   // Empty loop since the scheduler will handle the task execution
@@ -479,61 +535,6 @@ void ControlTask(void* pvParameters) {
   }
 }
 
-bool UserInputListener() {
-  if (Serial.available() > 0) {
-    String input = Serial.readStringUntil('\n');
-    input.trim();
-
-    int arrayIndex, innerIndex, startIndex = 0;
-    bool lastCharWasSpace = true;
-
-    for (int i = 0; i <= input.length(); i++) {
-      // Check if we have reached the end of a number or the end of the input
-      if (i == input.length() || input.charAt(i) == ' ') {
-        // Ensures that it still works if the user types more than 1 space between numbers
-        if (!lastCharWasSpace) {
-          // Extract number from string and convert to float
-          String inputNumberString = input.substring(startIndex, i);
-          float inputNumber = inputNumberString.toFloat();
-
-          // Save number in userInput array
-          userInput[arrayIndex][innerIndex] = inputNumber;
-          // Increment index number
-          innerIndex++;
-
-          // If the end of a path point is reached, reset innerIndex and increment outer index
-          if (innerIndex >= 6) {
-            innerIndex = 0;
-            arrayIndex++;
-          }
-
-          lastCharWasSpace = true;
-        }
-      } else {
-        // Set startindex to i if the last characters was space
-        if (lastCharWasSpace) {
-          startIndex = i;
-        }
-        lastCharWasSpace = false;
-      }
-
-      // Break if user has input more than 100 via points
-      if (arrayIndex >= 100) {
-        break;
-      }
-    }
-    // Print to check if correct
-    for (int i = 0; i < arrayIndex; i++) {
-      for (int j = 0; j < 6; j++) {
-        Serial.println(userInput[i][j]);
-      }
-      Serial.println();
-    }
-    return 1;
-  }
-  return 0;
-}
-
 void TrajectoryPlanner(void* pvParameters) {
   (void)pvParameters;
   TickType_t lastWakeTime = xTaskGetTickCount();
@@ -541,6 +542,9 @@ void TrajectoryPlanner(void* pvParameters) {
   // Local variables
   double duration = 0;
   double timeOffset = 0;
+
+  // Matrices
+  BLA::Matrix<6> R06;
 
   // If not already updated
   updateMotorState(M);
@@ -586,29 +590,38 @@ void TrajectoryPlanner(void* pvParameters) {
     // Trajectory should only be updated if the manipualtor is not already executing a trajectory
     if (!inMotionFlag) {
       // Use the converted user input to joint variables, times and velocities.
-      //User input is received and trajectories can be calculated.
+      if (UserInputListener) {
+        // Convert user input orientation to rotation matrix
+        for(int i = 1; i < TR[1]->numberOfViaPoints) {
 
-      // Compute cubic polynomial between each via point
-      for (int i = 0; i < 6; i++) {
-        for (int j = 0; j < Tr[i]->numberOfViaPoints - 1; j++) {
-          // Calculate duration of motion
-          duration = Tr[i]->times[j + 1] - Tr[i]->times[j];
-
-          // Compute Cubic Coefficients
-          Tr[i]->CubicCoefs[j] = getCubicCoef(duration, Tr[i]->positions[j], Tr[i]->positions[j + 1], Tr[i]->velocities[j], Tr[i]->velocities[j + 1]);
         }
-      }
-      // Capture time of motion start
-      timeOffset = millis();
+        R06 = convertEuler2Matrix(alpha, beta, gamma);
+
+        // Convert user input to joint space using inverse kinematics
 
 
-      // Set time offset for Polynomials
-      for (int i = 0; i < 6; i++) {
-        for (int j = 0; j < Tr[i]->numberOfViaPoints; j++) {
-          Tr[i]->timeOffsets[j] = Tr[i]->times[j] + timeOffset;
+        // Compute cubic polynomial between each via point
+        for (int i = 0; i < 6; i++) {
+          for (int j = 0; j < Tr[i]->numberOfViaPoints - 1; j++) {
+            // Calculate duration of motion
+            duration = Tr[i]->times[j + 1] - Tr[i]->times[j];
+
+            // Compute Cubic Coefficients
+            Tr[i]->CubicCoefs[j] = getCubicCoef(duration, Tr[i]->positions[j], Tr[i]->positions[j + 1], Tr[i]->velocities[j], Tr[i]->velocities[j + 1]);
+          }
         }
+        // Capture time of motion start
+        timeOffset = millis();
+
+        // Set time offset for Polynomials
+        for (int i = 0; i < 6; i++) {
+          for (int j = 0; j < Tr[i]->numberOfViaPoints; j++) {
+            Tr[i]->timeOffsets[j] = Tr[i]->times[j] + timeOffset;
+          }
+        }
+        inMotionFlag = 1;
+        //User input is received and trajectories can be calculated.
       }
-      inMotionFlag = 1;
     }
     // If the robot is not in motion, poll for user input
 
