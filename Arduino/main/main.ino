@@ -68,13 +68,13 @@ double* motorConstants[] = { MX_28_Constants, MX_64_Constants, MX_106_Constants 
   MX106: 321
 */
 
-// Initialize motors with their IDs
-Motor M1(1, MX_64, 311, -1030.0);
-Motor M2(2, MX_106, 321, -1029.0);
-Motor M3(3, MX_106, 321, -942.0);
-Motor M4(4, MX_28, 30, -978.0);
-Motor M5(5, MX_64, 311, -2020.0);
-Motor M6(6, MX_28, 30, -3458.0);
+// Initialize motors (ID;TYPE;MODEL;OPERATINGMODE;OFFSET)
+Motor M1(1, MX_64, 311, OP_PWM, -1030.0);
+Motor M2(2, MX_106, 321, OP_PWM, -1029.0);
+Motor M3(3, MX_106, 321, OP_PWM, -942.0);
+Motor M4(4, MX_28, 30, OP_PWM, -978.0);
+Motor M5(5, MX_64, 311, OP_PWM, -2020.0);
+Motor M6(6, MX_28, 30, OP_PWM, -3458.0);
 
 Motor* M[6] = { &M1, &M2, &M3, &M4, &M5, &M6 };
 
@@ -289,8 +289,8 @@ void ControlTask(void* pvParameters) {
   TickType_t lastWakeTime = xTaskGetTickCount();
 
   // Controller Parameters
-  double w_n[6] = { 17, 20, 20, 17, 15, 17 };              // natural frequency of system
-  double z_n[6] = { 1.05, 1.05, 1.05, 1.05, 1.05, 1.05 };  // damping ratio of system
+  double w_n[6] = { 15, 15, 15, 15, 15, 15 };              // natural frequency of system
+  double z_n[6] = { 1, 1, 1, 1, 1, 1 };  // damping ratio of system
 
   // General Variables
   double timeCapture = 0;
