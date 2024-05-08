@@ -447,7 +447,7 @@ void TrajectoryPlanner(void* pvParameters) {
   updateMotorState(M);
 
   // Just for tests (replaced by user input later)
-  double times[100] = { 0, 10, 20 };
+  double times[100] = { 0, 5, 10 };
   double positions[100] = { 0, PI / 4, PI / 2 };
   double velocities[100] = { 0, 0, 0 };
 
