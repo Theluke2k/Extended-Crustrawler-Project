@@ -276,6 +276,9 @@ void getPWM(BLA::Matrix<6> tau) {
   }
 }
 
+void updateMotorInput() {
+}
+
 
 /* ----- UNUSED LOOP ----- */
 void loop() {
@@ -289,8 +292,8 @@ void ControlTask(void* pvParameters) {
   TickType_t lastWakeTime = xTaskGetTickCount();
 
   // Controller Parameters
-  double w_n[6] = { 15, 15, 15, 15, 15, 15 };              // natural frequency of system
-  double z_n[6] = { 1, 1, 1, 1, 1, 1 };  // damping ratio of system
+  double w_n[6] = { 15, 15, 15, 15, 15, 15 };  // natural frequency of system
+  double z_n[6] = { 1, 1, 1, 1, 1, 1 };        // damping ratio of system
 
   // General Variables
   double timeCapture = 0;
@@ -382,11 +385,9 @@ void ControlTask(void* pvParameters) {
             qd_d(j) = getDesiredJointVelocity(inputTime, Tr[j]->CubicCoefs[i - 1]);
             qdd_d(j) = getDesiredJointAcceleration(inputTime, Tr[j]->CubicCoefs[i - 1]);
           }
-          break;
+          break;  // To prevent the loop executing the next cubic before time
         }
       }
-
-
 
       // Calculate control signal error
       q_e = q_d - q;
@@ -404,6 +405,7 @@ void ControlTask(void* pvParameters) {
       for (int i = 0; i < 6; i++) {
         Bqdd(i) = BqddArr[i];
       }
+
       //Serial << "y: " << y << '\n';
       //Serial << "Bqdd: " << Bqdd << '\n';
 
@@ -413,6 +415,9 @@ void ControlTask(void* pvParameters) {
       Serial << "tau: " << tau << '\n';
 
       // Convert torques to PWM using velocity feedback
+      updateMotorInput();
+
+      /*
       getPWM(tau);
 
       // Write PWM to motors
@@ -423,8 +428,8 @@ void ControlTask(void* pvParameters) {
           xSemaphoreGive(motorComms);
         }
       }
-    }
-    else {
+      */
+    } else {
       Serial.println("TIMEOUT DETECTED");
     }
 
