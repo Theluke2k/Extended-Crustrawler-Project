@@ -69,12 +69,12 @@ double* motorConstants[] = { MX_28_Constants, MX_64_Constants, MX_106_Constants 
 */
 
 // Initialize motors with their IDs
-Motor M1(1, MX_64, 311, -1030.0);
-Motor M2(2, MX_106, 321, -1029.0);
-Motor M3(3, MX_106, 321, -942.0);
-Motor M4(4, MX_28, 30, -978.0);
-Motor M5(5, MX_64, 311, -2020.0);
-Motor M6(6, MX_28, 30, -3458.0);
+Motor M1(1, MX_64, 311, OP_CURRENT, -1030.0);
+Motor M2(2, MX_106, 321, OP_CURRENT, -1029.0);
+Motor M3(3, MX_106, 321, OP_CURRENT, -942.0);
+Motor M4(4, MX_28, 30, OP_PWM, -978.0);
+Motor M5(5, MX_64, 311, OP_CURRENT, -2020.0);
+Motor M6(6, MX_28, 30, OP_PWM, -3458.0);
 
 Motor* M[6] = { &M1, &M2, &M3, &M4, &M5, &M6 };
 
@@ -119,11 +119,15 @@ void setup() {
     dxl.writeControlTableItem((uint8_t)RETURN_DELAY_TIME, (uint8_t)M[i]->ID, (int32_t)80, motorTimeout);
 
     //Serial.println(dxl.readControlTableItem(BAUD_RATE, M[i]->ID));
-    dxl.setOperatingMode(M[i]->ID, OP_PWM);
+    dxl.setOperatingMode(M[i]->ID, M[i]->mode);
+    if(M[i]->mode == OP_CURRENT) {
+      dxl.writeControlTableItem((uint8_t)GOAL_PWM, (uint8_t)M[i]->ID, (int32_t)200, motorTimeout);
+    }
 
     // Print info
     Serial.print("Motor");
     Serial.println(i);
+    Serial.println(dxl.readControlTableItem((uint8_t)OPERATING_MODE, (uint8_t)M[i]->ID, motorTimeout));
     Serial.println(dxl.readControlTableItem((uint8_t)OPERATING_MODE, (uint8_t)M[i]->ID, motorTimeout));
     Serial.println(dxl.readControlTableItem((uint8_t)RETURN_DELAY_TIME, (uint8_t)M[i]->ID, motorTimeout));
 
@@ -272,7 +276,7 @@ void getPWM(BLA::Matrix<6> tau) {
       pwm_test = -885;
     }
 
-    M[i]->PWM = pwm_test;
+    M[i]->input = pwm_test;
   }
 }
 
@@ -289,8 +293,8 @@ void ControlTask(void* pvParameters) {
   TickType_t lastWakeTime = xTaskGetTickCount();
 
   // Controller Parameters
-  double w_n[6] = { 17, 20, 20, 17, 15, 17 };              // natural frequency of system
-  double z_n[6] = { 1.05, 1.05, 1.05, 1.05, 1.05, 1.05 };  // damping ratio of system
+  double w_n[6] = { 3, 9, 7, 3, 7, 3 };  // natural frequency of system
+  double z_n[6] = { 0.6, 0.6, 0.6, 0.6, 0.6, 0.6 };  // damping ratio of system
 
   // General Variables
   double timeCapture = 0;
@@ -413,6 +417,35 @@ void ControlTask(void* pvParameters) {
       Serial << "tau: " << tau << '\n';
 
       // Convert torques to PWM using velocity feedback
+      for (int i = 0; i < 6; i++) {
+        if (!timeoutFlag) {
+          if (M[i]->mode == OP_CURRENT) {
+            if (M[i]->type == MX_106) {
+              M[i]->input = tau(i) * 133.33;
+            } else if (M[i]->type == MX_64) {
+              M[i]->input = tau(i) * 172.41;
+            }
+            xSemaphoreTake(motorComms, 1000);
+            dxl.writeControlTableItem((uint8_t)GOAL_CURRENT, (uint8_t)M[i]->ID, (int32_t)M[i]->input, motorTimeout);
+            xSemaphoreGive(motorComms);
+          } else if (M[i]->mode == OP_PWM) {
+            if (g(i) < 0) {
+              M[i]->input = tau(i) * 642 + M[i]->state.qd * motorConstants[M[i]->type][3];
+            } else if (g(i) == 0) {
+              M[i]->input = tau(i) * 427.4 + M[i]->state.qd * motorConstants[M[i]->type][3];
+            } else {
+              M[i]->input = tau(i) * 211.7 + M[i]->state.qd * motorConstants[M[i]->type][3];
+            }
+            xSemaphoreTake(motorComms, 1000);
+            dxl.writeControlTableItem((uint8_t)GOAL_PWM, (uint8_t)M[i]->ID, (int32_t)M[i]->input, motorTimeout);
+            xSemaphoreGive(motorComms);
+          }
+        }
+        Serial.println(M[i]->input);
+      }
+
+      // Convert torques to PWM using velocity feedback
+      /*
       getPWM(tau);
 
       // Write PWM to motors
@@ -423,8 +456,8 @@ void ControlTask(void* pvParameters) {
           xSemaphoreGive(motorComms);
         }
       }
-    }
-    else {
+      */
+    } else {
       Serial.println("TIMEOUT DETECTED");
     }
 
@@ -447,7 +480,7 @@ void TrajectoryPlanner(void* pvParameters) {
   updateMotorState(M);
 
   // Just for tests (replaced by user input later)
-  double times[100] = { 0, 5, 10 };
+  double times[100] = { 0, 10, 20 };
   double positions[100] = { 0, PI / 4, PI / 2 };
   double velocities[100] = { 0, 0, 0 };
 
