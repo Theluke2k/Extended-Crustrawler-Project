@@ -592,11 +592,12 @@ void TrajectoryPlanner(void* pvParameters) {
       // Use the converted user input to joint variables, times and velocities.
       if (UserInputListener) {
         // Convert user input orientation to rotation matrix
+        /*
         for(int i = 1; i < TR[1]->numberOfViaPoints) {
 
         }
         R06 = convertEuler2Matrix(alpha, beta, gamma);
-
+        */
         // Convert user input to joint space using inverse kinematics
 
 
