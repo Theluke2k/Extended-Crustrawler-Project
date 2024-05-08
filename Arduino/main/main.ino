@@ -82,12 +82,12 @@ Motor M6(6, MX_28, 30, OP_PWM, -3458.0);
 Motor* M[6] = { &M1, &M2, &M3, &M4, &M5, &M6 };
 
 // Initialize Trajectory planner with number of via points
-Trajectory Tr1(3);
-Trajectory Tr2(3);
-Trajectory Tr3(3);
-Trajectory Tr4(3);
-Trajectory Tr5(3);
-Trajectory Tr6(3);
+Trajectory Tr1(2);
+Trajectory Tr2(2);
+Trajectory Tr3(2);
+Trajectory Tr4(2);
+Trajectory Tr5(2);
+Trajectory Tr6(2);
 
 Trajectory* Tr[6] = { &Tr1, &Tr2, &Tr3, &Tr4, &Tr5, &Tr6 };
 
@@ -388,7 +388,7 @@ uint8_t UserInputListener() {
         break;
       }
     }
-    /*
+    
     Serial.println("PRINT CHECK");
     for (int i = 1; i < arrayIndex; i++) {
       Serial.println(userTimes[i]);
@@ -396,10 +396,28 @@ uint8_t UserInputListener() {
         Serial.println(userPositions[i][j]);
       }
     }
-    */
+    
     return 1;
   }
   return 0;
+}
+
+BLA::Matrix<3,3> convertEuler2Matrix(float a, float b, float y) {
+  BLA::Matrix<3,3> R;
+
+  R(0,0) = cos(a)*cos(b);
+  R(0,1) = cos(a)*sin(b)*sin(y) - sin(a)*cos(y);
+  R(0,2) = cos(a)*sin(b)*cos(y) + sin(a)*sin(y);
+  R(1,0) = sin(a)*cos(b);
+  R(1,1) = sin(a)*sin(b)*sin(y) + cos(a)*cos(y);
+  R(1,2) = sin(a)*sin(b)*cos(y) - cos(a)*sin(y);
+  R(2,0) = -sin(b);
+  R(2,1) = cos(b)*sin(y);
+  R(2,2) = cos(b)*cos(y);
+
+  Serial << "R: " << R << '\n';
+  return R;
+
 }
 
 /* ----- UNUSED LOOP ----- */
@@ -560,7 +578,7 @@ void TrajectoryPlanner(void* pvParameters) {
   double timeOffset = 0;
 
   // Matrices
-  BLA::Matrix<6> R06;
+  BLA::Matrix<3,3> R06;
 
   // If not already updated
   updateMotorState(M);
@@ -606,15 +624,13 @@ void TrajectoryPlanner(void* pvParameters) {
     // Trajectory should only be updated if the manipualtor is not already executing a trajectory
     if (!inMotionFlag) {
       if (UserInputListener()) { // format "time1 time2 , p11 p12 p13 o11 o12 o13 p21 p22 p23 o21 o22 o23"
-        /*
-        for (int i = 1; i < TR[1]->numberOfViaPoints) {
+        for (int i = 1; i <= Tr[1]->numberOfViaPoints; i++) {
           // Convert user input orientation to rotation matrix and to joint space
-          R06 = convertEuler2Matrix(alpha, beta, gamma);
+          R06 = convertEuler2Matrix(userPositions[i][3], userPositions[i][4], userPositions[i][5]);
 
           // Convert user input to joint space using inverse kinematics
-          Positions
+          
         }
-        */
 
 
 
