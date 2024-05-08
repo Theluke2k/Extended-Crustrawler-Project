@@ -110,22 +110,22 @@ void setup() {
     Serial.print("Ping: ");
     Serial.println(dxl.ping(M[i]->ID));
 
-    Serial.println("Calling Function...");
-    x = micros();
-    Serial.println(dxl.readControlTableItem((uint8_t)ID, (uint8_t)M[i]->ID));
-    Serial.println(micros() - x);
+    // Serial.println("Calling Function...");
+    //x = micros();
+    //Serial.println(dxl.readControlTableItem((uint8_t)ID, (uint8_t)M[i]->ID));
+    //Serial.println(micros() - x);
 
     dxl.torqueOff(M[i]->ID);
-    //dxl.writeControlTableItem((uint8_t)RETURN_DELAY_TIME, (uint8_t)M[i]->ID, (int32_t)50, motorTimeout);
+    dxl.writeControlTableItem((uint8_t)RETURN_DELAY_TIME, (uint8_t)M[i]->ID, (int32_t)100, motorTimeout);
 
     //Serial.println(dxl.readControlTableItem(BAUD_RATE, M[i]->ID));
     dxl.setOperatingMode(M[i]->ID, OP_PWM);
 
     // Print info
-    //Serial.print("Motor");
-    //Serial.println(i);
-    //Serial.println(dxl.readControlTableItem((uint8_t)OPERATING_MODE, (uint8_t)M[i]->ID, motorTimeout));
-    //Serial.println(dxl.readControlTableItem((uint8_t)RETURN_DELAY_TIME, (uint8_t)M[i]->ID, motorTimeout));
+    Serial.print("Motor");
+    Serial.println(i);
+    Serial.println(dxl.readControlTableItem((uint8_t)OPERATING_MODE, (uint8_t)M[i]->ID, motorTimeout));
+    Serial.println(dxl.readControlTableItem((uint8_t)RETURN_DELAY_TIME, (uint8_t)M[i]->ID, motorTimeout));
 
     dxl.torqueOn(M[i]->ID);
   }
@@ -138,13 +138,17 @@ void setup() {
   xTaskCreate(TrajectoryPlanner, "Trajectory Planner", 20000, NULL, 1, NULL);
 }
 
+extern bool timeoutFlag;
+
 /* ----- GENERAL FUNCTIONS -----*/
 void getMotorState(Motor* M, int sensitivity) {
   double x = 0;
   xSemaphoreTake(motorComms, 1000);
-  //int y = micros();
   x = ((dxl.readControlTableItem((uint8_t)PRESENT_POSITION, M->ID, motorTimeout) + M->offset) / 4096.0) * 2 * PI;
-  //Serial.println(micros() - y);
+  xSemaphoreGive(motorComms);
+  if (timeoutFlag) {
+    return;
+  }
   if (abs(x - M->state.q) < sensitivity) {
     M->state.q = x;
   } else {
@@ -158,13 +162,12 @@ void getMotorState(Motor* M, int sensitivity) {
     Serial.println(abs(x - M->state.q));
   }
 
-
-  //Serial.println(((dxl.readControlTableItem((uint8_t)PRESENT_VELOCITY, M->ID, 4) * 0.229) / 60.0) * 2.0 * PI);
-  // Converted from RAW units to rad/s
-  //M->state.qd = ((dxl.getPresentVelocity(M->ID, UNIT_RAW) * 0.229) / 60.0) * 2.0 * PI;
-  //y = micros();
-  x = ((dxl.readControlTableItem((uint8_t)PRESENT_VELOCITY, M->ID, (uint32_t)4) * 0.229) / 60.0) * 2.0 * PI;
-  //Serial.println(micros() - y);
+  xSemaphoreTake(motorComms, 1000);
+  x = ((dxl.readControlTableItem((uint8_t)PRESENT_VELOCITY, M->ID, (uint32_t)motorTimeout) * 0.229) / 60.0) * 2.0 * PI;
+  xSemaphoreGive(motorComms);
+  if (timeoutFlag) {
+    return;
+  }
   if (abs(x - M->state.qd) < sensitivity) {
     M->state.qd = x;
   } else {
@@ -177,15 +180,12 @@ void getMotorState(Motor* M, int sensitivity) {
     Serial.print(" | Diff:  ");
     Serial.println(x - M->state.qd);
   }
-  xSemaphoreGive(motorComms);
 }
 
 //
 void updateMotorState(Motor* M[6]) {
   for (int i = 0; i < 6; i++) {
-    if (inMotionFlag == 0) {
-      getMotorState(M[i], 10);
-    } else {
+    if (!timeoutFlag) {
       getMotorState(M[i], 10);
     }
   }
@@ -289,7 +289,7 @@ void ControlTask(void* pvParameters) {
   TickType_t lastWakeTime = xTaskGetTickCount();
 
   // Controller Parameters
-  double w_n[6] = { 15, 20, 20, 17, 15, 17 };        // natural frequency of system
+  double w_n[6] = { 15, 17, 17, 17, 15, 17 };              // natural frequency of system
   double z_n[6] = { 1.05, 1.05, 1.05, 1.05, 1.05, 1.05 };  // damping ratio of system
 
   // General Variables
@@ -336,11 +336,12 @@ void ControlTask(void* pvParameters) {
 
   while (1) {
     duration = micros();
+    timeoutFlag = 0;
     // Read position and velocity of the motor
     updateMotorState(M);
 
-    if (inMotionFlag) {
-      
+    if (inMotionFlag && !timeoutFlag) {
+
       // Insert motor state in vector
       q = getCurrentPositionVector(M);
       qd = getCurrentVelocityVector(M);
@@ -363,10 +364,10 @@ void ControlTask(void* pvParameters) {
         Cqd(i) = CqdArr[i];
         g(i) = gArr[i];
       }
-      
+
       //Serial << "Cqd: " << Cqd << '\n';
       //Serial << "g: " << g << '\n';
-      
+
       // Capture current time
       timeCapture = millis();
 
@@ -384,8 +385,8 @@ void ControlTask(void* pvParameters) {
           break;
         }
       }
-      
-      
+
+
 
       // Calculate control signal error
       q_e = q_d - q;
@@ -397,7 +398,7 @@ void ControlTask(void* pvParameters) {
       // Caluclate input to B(q)y block
       y = Kp * q_e + Kd * qd_e + qdd_d;
       y_op = { y(0), y(1), y(2), y(3), y(4), y(5) };
-      
+
       // Calculate output of B(q)y block and store in vector
       get_Bqdd(BqddArr, &q_op, &y_op, &opt);
       for (int i = 0; i < 6; i++) {
@@ -408,123 +409,29 @@ void ControlTask(void* pvParameters) {
 
       // Calculate required torque of motors
       tau = Bqdd + Cqd + g;
-      
-      /*
-      for(int i = 0; i < 6; i++) {
-        Serial.print("q: ");
-        Serial.println(q(i),5);
-        Serial.print("qd: ");
-        Serial.println(qd(i),5);
-        Serial.print("Cqd: ");
-        Serial.println(Cqd(i),5);
-        Serial.print("g: ");
-        Serial.println(g(i),5);
-        Serial.print("q_e: ");
-        Serial.println(q_e(i),5);
-        Serial.print("qd_e: ");
-        Serial.println(qd_e(i),5);
-        Serial.print("y: ");
-        Serial.println(y(i),5);
-        Serial.print("Bqdd: ");
-        Serial.println(Bqdd(i),5);
-        Serial.print("tau: ");
-        Serial.println(tau(i),5);
-      }*/
-      /*
-      Serial.print("q: ");
-      for(int i = 0; i < 6; i++) {
-        Serial.print(q(i),5);
-        Serial.print(", ");
-      }
-      Serial.println();
-      Serial.print("qd: ");
-      for(int i = 0; i < 6; i++) {
-        Serial.print(qd(i),5);
-        Serial.print(", ");
-      }
-      Serial.println();
-      Serial.print("Cqd: ");
-      for(int i = 0; i < 6; i++) {
-        Serial.print(Cqd(i),5);
-        Serial.print(", ");
-      }
-      Serial.println();
-      Serial.print("g: ");
-      for(int i = 0; i < 6; i++) {
-        Serial.print(g(i),5);
-        Serial.print(", ");
-      }
-      Serial.println();
-      Serial.print("q_d: ");
-      for(int i = 0; i < 6; i++) {
-        Serial.print(q_d(i),5);
-        Serial.print(", ");
-      }
-      Serial.println();
-      Serial.print("qd_d: ");
-      for(int i = 0; i < 6; i++) {
-        Serial.print(qd_d(i),5);
-        Serial.print(", ");
-      }
-      Serial.println();
-      Serial.print("qdd_d: ");
-      for(int i = 0; i < 6; i++) {
-        Serial.print(qdd_d(i),5);
-        Serial.print(", ");
-      }
-      Serial.println();
-      Serial.print("q_e: ");
-      for(int i = 0; i < 6; i++) {
-        Serial.print(q_e(i),5);
-        Serial.print(", ");
-      }
-      Serial.println();
-      Serial.print("qd_e: ");
-      for(int i = 0; i < 6; i++) {
-        Serial.print(qd_e(i),5);
-        Serial.print(", ");
-      }
-      Serial.println();
-      Serial.print("y: ");
-      for(int i = 0; i < 6; i++) {
-        Serial.print(y(i),5);
-        Serial.print(", ");
-      }
-      Serial.println();
-      Serial.print("Bqdd: ");
-      for(int i = 0; i < 6; i++) {
-        Serial.print(Bqdd(i),5);
-        Serial.print(", ");
-      }
-      Serial.println();
-      Serial.print("tau: ");
-      for(int i = 0; i < 6; i++) {
-        Serial.print(tau(i),5);
-        Serial.print(", ");
-      }
-      Serial.println();*/
-      
-      //Serial << "tau: " << tau << '\n';
-      
+
+      Serial << "tau: " << tau << '\n';
+
       // Convert torques to PWM using velocity feedback
       getPWM(tau);
-      
-      xSemaphoreTake(motorComms, 1000);
+
       // Write PWM to motors
       for (int i = 0; i < 6; i++) {
-        dxl.writeControlTableItem((uint8_t)GOAL_PWM, (uint8_t)M[i]->ID, (int32_t)M[i]->PWM, motorTimeout);
+        if (!timeoutFlag) {
+          xSemaphoreTake(motorComms, 1000);
+          dxl.writeControlTableItem((uint8_t)GOAL_PWM, (uint8_t)M[i]->ID, (int32_t)M[i]->PWM, motorTimeout);
+          xSemaphoreGive(motorComms);
+        }
       }
-      xSemaphoreGive(motorComms);
-      
+    }
+    else {
+      Serial.println("TIMEOUT DETECTED");
     }
 
     Serial.println(micros() - duration);
-    
-
-
     Serial.println();
 
-    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(35));
+    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(30));
   }
 }
 
