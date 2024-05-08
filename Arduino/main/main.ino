@@ -293,8 +293,8 @@ void ControlTask(void* pvParameters) {
   TickType_t lastWakeTime = xTaskGetTickCount();
 
   // Controller Parameters
-  double w_n[6] = { 3, 9, 7, 3, 7, 3 };  // natural frequency of system
-  double z_n[6] = { 0.6, 0.6, 0.6, 0.6, 0.6, 0.6 };  // damping ratio of system
+  double w_n[6] = { 3, 20, 10, 3, 7, 3 };  // natural frequency of system
+  double z_n[6] = { 1, 1, 1, 1, 1, 1 };  // damping ratio of system
 
   // General Variables
   double timeCapture = 0;
