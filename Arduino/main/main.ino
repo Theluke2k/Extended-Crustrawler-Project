@@ -52,7 +52,8 @@ double MX_28_Constants[4] = { 211.7, 427.4, 642.0, 115.3 };
 double MX_64_Constants[4] = { 80.9, 152.7, 224.5, 105.3 };
 double MX_106_Constants[4] = { 40.4, 83.9, 127.5, 160.6 };
 double* motorConstants[] = { MX_28_Constants, MX_64_Constants, MX_106_Constants };
-float userInput[100][6] = { 0 };
+float userPositions[100][6] = { 0 };
+float userTimes[100] = { 0 };
 
 
 /*
@@ -137,7 +138,7 @@ void setup() {
 
   // Task Creation
   xTaskCreate(ControlTask, "Control Task", 50000, NULL, 1, NULL);
-  xTaskCreate(TrajectoryPlanner, "Trajectory Planner", 20000, NULL, 1, NULL);
+  xTaskCreate(TrajectoryPlanner, "Trajectory Planner", 40000, NULL, 1, NULL);
 }
 
 extern bool timeoutFlag;
@@ -331,18 +332,24 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
   }
 }
 
-bool UserInputListener() {
+uint8_t UserInputListener() {
   if (Serial.available() > 0) {
     String input = Serial.readStringUntil('\n');
     input.trim();
 
-    int innerIndex, startIndex = 0;
+    int innerIndex = 0;
+    int startIndex = 0;
     int arrayIndex = 1;
     bool lastCharWasSpace = true;
+    bool isPosition = 0;
+    int offset = 0;
 
     for (int i = 0; i <= input.length(); i++) {
       // Check if we have reached the end of a number or the end of the input
-      if (i == input.length() || input.charAt(i) == ' ') {
+      if (input.charAt(i) == ',') {
+        isPosition = 1;
+        arrayIndex = 1;
+      } else if (i == input.length() || input.charAt(i) == ' ') {
         // Ensures that it still works if the user types more than 1 space between numbers
         if (!lastCharWasSpace) {
           // Extract number from string and convert to float
@@ -350,13 +357,18 @@ bool UserInputListener() {
           float inputNumber = inputNumberString.toFloat();
 
           // Save number in userInput array
-          userInput[arrayIndex][innerIndex] = inputNumber;
-          // Increment index number
-          innerIndex++;
+          if (isPosition) {
+            userPositions[arrayIndex][innerIndex] = inputNumber;
 
-          // If the end of a path point is reached, reset innerIndex and increment outer index
-          if (innerIndex >= 6) {
-            innerIndex = 0;
+            innerIndex++;
+
+            // If the end of a path point is reached, reset innerIndex and increment outer index
+            if (innerIndex >= 6) {
+              innerIndex = 0;
+              arrayIndex++;
+            }
+          } else {
+            userTimes[arrayIndex] = inputNumber;
             arrayIndex++;
           }
 
@@ -374,13 +386,13 @@ bool UserInputListener() {
       if (arrayIndex >= 100) {
         break;
       }
-    }
-    // Print to check if correct
-    for (int i = 0; i < arrayIndex; i++) {
-      for (int j = 0; j < 6; j++) {
-        Serial.println(userInput[i][j]);
+      Serial.println("PRINT CHECK");
+      for (int i = 1; i < arrayIndex; i++) {
+        Serial.println(userTimes[i]);
+        for (int j = 0; j < 6; j++) {
+          Serial.println(userPositions[i][j]);
+        }
       }
-      Serial.println();
     }
     return 1;
   }
@@ -451,7 +463,8 @@ void ControlTask(void* pvParameters) {
     updateMotorState(M);
 
     if (inMotionFlag && !timeoutFlag) {
-
+      Serial.println(inMotionFlag);
+      Serial.println(timeoutFlag);
       // Insert motor state in vector
       q = getCurrentPositionVector(M);
       qd = getCurrentVelocityVector(M);
@@ -531,7 +544,7 @@ void ControlTask(void* pvParameters) {
     Serial.println(micros() - duration);
     Serial.println();
 
-    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(30));
+    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(100));
   }
 }
 
@@ -589,16 +602,19 @@ void TrajectoryPlanner(void* pvParameters) {
   while (1) {
     // Trajectory should only be updated if the manipualtor is not already executing a trajectory
     if (!inMotionFlag) {
-      // Use the converted user input to joint variables, times and velocities.
-      if (UserInputListener) {
-        // Convert user input orientation to rotation matrix
+      if (UserInputListener()) {
         /*
-        for(int i = 1; i < TR[1]->numberOfViaPoints) {
+        for (int i = 1; i < TR[1]->numberOfViaPoints) {
+          // Convert user input orientation to rotation matrix and to joint space
+          R06 = convertEuler2Matrix(alpha, beta, gamma);
 
+          // Convert user input to joint space using inverse kinematics
+          Positions
         }
-        R06 = convertEuler2Matrix(alpha, beta, gamma);
         */
-        // Convert user input to joint space using inverse kinematics
+
+
+
 
 
         // Compute cubic polynomial between each via point
