@@ -3,7 +3,10 @@
 #include <BasicLinearAlgebra.h>
 #include "Dynamics.h"
 #include "Structures.h"
+#include "Kinematics.h"
 
+// Function prototypes
+//BLA::Matrix<6> InverseKinematics(float p1, float p2, float p3, BLA::Matrix<3, 3> R, int choice1, int choice2);
 
 #define DXL_SERIAL Serial1
 #define DEBUG_SERIAL Serial
@@ -47,6 +50,8 @@ static SemaphoreHandle_t motorComms;
 // Application specific variables
 bool inMotionFlag = 0;
 bool trajectoryReadyFlag = 0;
+extern bool validInput;
+extern bool timeoutFlag;
 uint32_t motorTimeout = 5;
 double MX_28_Constants[4] = { 211.7, 427.4, 642.0, 115.3 };
 double MX_64_Constants[4] = { 80.9, 152.7, 224.5, 105.3 };
@@ -54,7 +59,6 @@ double MX_106_Constants[4] = { 40.4, 83.9, 127.5, 160.6 };
 double* motorConstants[] = { MX_28_Constants, MX_64_Constants, MX_106_Constants };
 float userPositions[100][6] = { 0 };
 float userTimes[100] = { 0 };
-
 
 /*
   Motor 1: 1030, 1
@@ -72,22 +76,22 @@ float userTimes[100] = { 0 };
 */
 
 // Initialize motors (ID;TYPE;MODEL;OPERATINGMODE;OFFSET)
-Motor M1(1, MX_64, 311, OP_PWM, -1030.0);
-Motor M2(2, MX_106, 321, OP_PWM, -1029.0);
-Motor M3(3, MX_106, 321, OP_PWM, -942.0);
-Motor M4(4, MX_28, 30, OP_PWM, -978.0);
-Motor M5(5, MX_64, 311, OP_PWM, -2020.0);
-Motor M6(6, MX_28, 30, OP_PWM, -3458.0);
+Motor M1(10, MX_64, 311, OP_PWM, -3.15, 3.15, -1030.0);
+Motor M2(11, MX_106, 321, OP_PWM, -0.1, 3.15, -1029.0);
+Motor M3(3, MX_106, 321, OP_PWM, -0.1, 3.15, -942.0);
+Motor M4(4, MX_28, 30, OP_PWM, -3.15, 3.15, -978.0);
+Motor M5(5, MX_64, 311, OP_PWM, -3.15 / 2, 3.15 / 2, -2020.0);
+Motor M6(6, MX_28, 30, OP_PWM, -3.15, 3.15, -3458.0);
 
 Motor* M[6] = { &M1, &M2, &M3, &M4, &M5, &M6 };
 
 // Initialize Trajectory planner with number of via points
-Trajectory Tr1(2);
-Trajectory Tr2(2);
-Trajectory Tr3(2);
-Trajectory Tr4(2);
-Trajectory Tr5(2);
-Trajectory Tr6(2);
+Trajectory Tr1(3);
+Trajectory Tr2(3);
+Trajectory Tr3(3);
+Trajectory Tr4(3);
+Trajectory Tr5(3);
+Trajectory Tr6(3);
 
 Trajectory* Tr[6] = { &Tr1, &Tr2, &Tr3, &Tr4, &Tr5, &Tr6 };
 
@@ -119,7 +123,7 @@ void setup() {
     //Serial.println(micros() - x);
 
     dxl.torqueOff(M[i]->ID);
-    dxl.writeControlTableItem((uint8_t)RETURN_DELAY_TIME, (uint8_t)M[i]->ID, (int32_t)80, motorTimeout);
+    dxl.writeControlTableItem((uint8_t)RETURN_DELAY_TIME, (uint8_t)M[i]->ID, (int32_t)100, motorTimeout);
 
     //Serial.println(dxl.readControlTableItem(BAUD_RATE, M[i]->ID));
     dxl.setOperatingMode(M[i]->ID, OP_PWM);
@@ -136,12 +140,13 @@ void setup() {
   // Semaphore Creation
   motorComms = xSemaphoreCreateMutex();
 
-  // Task Creation
-  xTaskCreate(ControlTask, "Control Task", 50000, NULL, 1, NULL);
-  xTaskCreate(TrajectoryPlanner, "Trajectory Planner", 40000, NULL, 1, NULL);
-}
+  //BLA::Matrix<3, 3> g = { 0, 0.7071, -0.7071, 0, -0.7071, -0.7071, -1, 0, 0 };
+  //BLA::Matrix<6> h = InverseKinematics(-0.4207, -0.4207, 0.157, g, 1, 1);
 
-extern bool timeoutFlag;
+  // Task Creation
+  xTaskCreate(ControlTask, "Control Task", 40000, NULL, 1, NULL);
+  xTaskCreate(TrajectoryPlanner, "Trajectory Planner", 30000, NULL, 1, NULL);
+}
 
 /* ----- GENERAL FUNCTIONS -----*/
 void getMotorState(Motor* M, int sensitivity) {
@@ -187,9 +192,10 @@ void getMotorState(Motor* M, int sensitivity) {
 
 //
 void updateMotorState(Motor* M[6]) {
-  for (int i = 0; i < 6; i++) {
-    if (!timeoutFlag) {
-      getMotorState(M[i], 10);
+  for (int i = 0; i < 2; i++) {
+    getMotorState(M[i], 10);
+    if (timeoutFlag) {
+      return;
     }
   }
 }
@@ -284,11 +290,12 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
   int motorType = 0;
   double input_test = 0;
 
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < 2; i++) {
     // Do nothing if a timeout was indicated
     if (!timeoutFlag) {
       // Chech the operating mode of the motor
       if (M[i]->mode == OP_CURRENT) {
+        Serial.println(M[i]->mode);
         if (M[i]->type == MX_106) {
           M[i]->input = tau(i) * 133.33;
         } else if (M[i]->type == MX_64) {
@@ -296,7 +303,8 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
         } else if (M[i]->type == MX_28) {
           Serial.println("INVALID MOTOR TYPE FOR CURRENT CONTROL");
         }
-
+        Serial.print("Writing current value: ");
+        Serial.println(M[i]->input);
         // Write new current value to the motor
         xSemaphoreTake(motorComms, 1000);
         dxl.writeControlTableItem((uint8_t)GOAL_CURRENT, (uint8_t)M[i]->ID, (int32_t)M[i]->input, motorTimeout);
@@ -307,6 +315,7 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
           else if: assisted by gravity.
           else: not affected by gravity.
         */
+
         if (((tau(i) < 0) && (g(i) < 0)) || ((tau(i) > 0) && (g(i) > 0))) {
           input_test = tau(i) * motorConstants[motorType][2] + M[i]->state.qd * motorConstants[motorType][3];
         } else if (((tau(i) < 0) && (g(i) > 0)) || ((tau(i) > 0) && (g(i) < 0))) {
@@ -323,6 +332,9 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
           input_test = -885;
         }
 
+        M[i]->input = input_test;
+        Serial.print("PWM: ");
+        Serial.println(M[i]->input);
         // Write the new PWM value to the motor
         xSemaphoreTake(motorComms, 1000);
         dxl.writeControlTableItem((uint8_t)GOAL_PWM, (uint8_t)M[i]->ID, (int32_t)M[i]->input, motorTimeout);
@@ -388,37 +400,38 @@ uint8_t UserInputListener() {
         break;
       }
     }
-    
+
     Serial.println("PRINT CHECK");
     for (int i = 1; i < arrayIndex; i++) {
       Serial.println(userTimes[i]);
       for (int j = 0; j < 6; j++) {
         Serial.println(userPositions[i][j]);
+        Tr[i]->numberOfViaPoints = arrayIndex - 1;
       }
     }
-    
+
     return 1;
   }
   return 0;
 }
 
-BLA::Matrix<3,3> convertEuler2Matrix(float a, float b, float y) {
-  BLA::Matrix<3,3> R;
+BLA::Matrix<3, 3> convertEuler2Matrix(float a, float b, float y) {
+  BLA::Matrix<3, 3> R;
 
-  R(0,0) = cos(a)*cos(b);
-  R(0,1) = cos(a)*sin(b)*sin(y) - sin(a)*cos(y);
-  R(0,2) = cos(a)*sin(b)*cos(y) + sin(a)*sin(y);
-  R(1,0) = sin(a)*cos(b);
-  R(1,1) = sin(a)*sin(b)*sin(y) + cos(a)*cos(y);
-  R(1,2) = sin(a)*sin(b)*cos(y) - cos(a)*sin(y);
-  R(2,0) = -sin(b);
-  R(2,1) = cos(b)*sin(y);
-  R(2,2) = cos(b)*cos(y);
+  R(0, 0) = cos(a) * cos(b);
+  R(0, 1) = cos(a) * sin(b) * sin(y) - sin(a) * cos(y);
+  R(0, 2) = cos(a) * sin(b) * cos(y) + sin(a) * sin(y);
+  R(1, 0) = sin(a) * cos(b);
+  R(1, 1) = sin(a) * sin(b) * sin(y) + cos(a) * cos(y);
+  R(1, 2) = sin(a) * sin(b) * cos(y) - cos(a) * sin(y);
+  R(2, 0) = -sin(b);
+  R(2, 1) = cos(b) * sin(y);
+  R(2, 2) = cos(b) * cos(y);
 
-  Serial << "R: " << R << '\n';
   return R;
-
 }
+
+
 
 /* ----- UNUSED LOOP ----- */
 void loop() {
@@ -432,8 +445,8 @@ void ControlTask(void* pvParameters) {
   TickType_t lastWakeTime = xTaskGetTickCount();
 
   // Controller Parameters
-  double w_n[6] = { 15, 15, 15, 15, 15, 15 };  // natural frequency of system
-  double z_n[6] = { 1, 1, 1, 1, 1, 1 };        // damping ratio of system
+  double w_n[6] = { 6, 6, 5, 5, 5, 5 };  // natural frequency of system
+  double z_n[6] = { 1, 1, 1, 1, 1, 1 };  // damping ratio of system
 
   // General Variables
   double timeCapture = 0;
@@ -479,13 +492,12 @@ void ControlTask(void* pvParameters) {
 
   while (1) {
     duration = micros();
+
     timeoutFlag = 0;
     // Read position and velocity of the motor
     updateMotorState(M);
 
     if (inMotionFlag && !timeoutFlag) {
-      Serial.println(inMotionFlag);
-      Serial.println(timeoutFlag);
       // Insert motor state in vector
       q = getCurrentPositionVector(M);
       qd = getCurrentVelocityVector(M);
@@ -516,7 +528,7 @@ void ControlTask(void* pvParameters) {
       timeCapture = millis();
 
       // Calculate desired joint variables
-      for (int i = 1; i < Tr1.numberOfViaPoints; i++) {
+      for (int i = 1; i <= Tr1.numberOfViaPoints; i++) {
         // Find the current path period
         if (timeCapture < Tr1.timeOffsets[i]) {
           // Use cubic polynomials to define desired joint variables.
@@ -530,12 +542,15 @@ void ControlTask(void* pvParameters) {
         }
       }
 
+      Serial << "q_d: " << q_d << '\n';
+      Serial << "qd_d: " << qd_d << '\n';
+
       // Calculate control signal error
       q_e = q_d - q;
       qd_e = qd_d - qd;
 
-      //Serial << "q_e: " << q_e << '\n';
-      //Serial << "qd_e: " << qd_e << '\n';
+      Serial << "q_e: " << q_e << '\n';
+      Serial << "qd_e: " << qd_e << '\n';
 
       // Caluclate input to B(q)y block
       y = Kp * q_e + Kd * qd_e + qdd_d;
@@ -554,18 +569,18 @@ void ControlTask(void* pvParameters) {
       tau = Bqdd + Cqd + g;
 
       Serial << "tau: " << tau << '\n';
-
+      
       // Update the motor input depending on the operating mode
       updateMotorInput(tau, g);
 
-    } else {
+    } else if (timeoutFlag) {
       Serial.println("TIMEOUT DETECTED");
     }
 
     Serial.println(micros() - duration);
     Serial.println();
 
-    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(100));
+    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(40));
   }
 }
 
@@ -577,8 +592,10 @@ void TrajectoryPlanner(void* pvParameters) {
   double duration = 0;
   double timeOffset = 0;
 
+
   // Matrices
-  BLA::Matrix<3,3> R06;
+  BLA::Matrix<3, 3> R06;
+  BLA::Matrix<6> q;
 
   // If not already updated
   updateMotorState(M);
@@ -587,7 +604,7 @@ void TrajectoryPlanner(void* pvParameters) {
   float times[100] = { 0, 5, 10 };
   float positions[100][6] = { 0 };
   float velocities[100][6] = { 0 };
-
+  /*
   // Initialize some inputs for tests
   // First point
   positions[1][0] = PI / 4;
@@ -604,64 +621,138 @@ void TrajectoryPlanner(void* pvParameters) {
   positions[2][3] = PI / 2;
   positions[2][4] = PI / 2;
   positions[2][5] = PI / 2;
-
+  */
   // Initialize path points (this should be executed in runtime in reality)
-  for (int i = 0; i < 6; i++) {
-    // Set initial path point
-    Tr[i]->times[0] = 0;
-    Tr[i]->positions[0] = M[i]->state.q;  //
-    Tr[i]->velocities[0] = 0;             //M[i]->state.qd.  Maybe better to set to zero? In case of a bad reading, the trajectory will be crazy...
 
-    // Set the rest of the path points
-    for (int j = 1; j < Tr[i]->numberOfViaPoints; j++) {
-      Tr[i]->times[j] = times[j] * 1000.0;
-      Tr[i]->positions[j] = positions[j][i];
-      Tr[i]->velocities[j] = velocities[j][i];
-    }
-  }
 
   while (1) {
     // Trajectory should only be updated if the manipualtor is not already executing a trajectory
     if (!inMotionFlag) {
-      if (UserInputListener()) { // format "time1 time2 , p11 p12 p13 o11 o12 o13 p21 p22 p23 o21 o22 o23"
+      if (UserInputListener()) {  // format "time1 time2 , p11 p12 p13 o11 o12 o13 p21 p22 p23 o21 o22 o23"
         for (int i = 1; i <= Tr[1]->numberOfViaPoints; i++) {
           // Convert user input orientation to rotation matrix and to joint space
           R06 = convertEuler2Matrix(userPositions[i][3], userPositions[i][4], userPositions[i][5]);
 
+          Serial << "R06: " << R06 << '\n';
+
           // Convert user input to joint space using inverse kinematics
+          int choice1 = 1;
+          int choice2 = 1;
+          for (int j = 0; j < 6; j++) {
+            validInput = true;
+            q = InverseKinematics(userPositions[i][0], userPositions[i][1], userPositions[i][2], R06, choice1, choice2);
+            for (int k = 0; k < 6; k++) {
+              if (q(k) <= -3.14 && q(k) >= -3.15) {
+                q(k) = PI;
+              }
+            }/*
+            Serial.println("LIIMTS: ");
+            Serial.println(q(j));
+            Serial.println(M[j]->higherLimit);
+            Serial.println(M[j]->lowerLimit);
+*/
+            // Check validity of solution
+            if (q(j) > M[j]->higherLimit || q(j) < M[j]->lowerLimit || isnan(q(j))) {
+              if (j < 3) {
+                if (choice1 < 3) {
+                  j = 0;
+                  choice1++;
+                  continue;
+                } else {
+                  validInput = false;
+                  Serial.println("No valid solution was found for the position within the manipulator limits!");
+                  break;
+                }
+              } else {
+                if (choice2 < 2) {
+                  j = 0;
+                  choice2++;
+                  continue;
+                } else {
+                  validInput = false;
+                  Serial.println("No valid solution was found for the orientation within the manipulator limits!");
+                  break;
+                }
+              }
+            }
+          }
+          if (validInput) {
+            /*
+            Serial.println("Found solution: ");
+            Serial.println(choice1);
+            Serial.println(choice2);
+*/
+            // If a valid solution was found, save the via points in a local array
+            for (int j = 0; j < 6; j++) {
+              positions[i][j] = q(j);
+              //Serial.println(positions[i][j]);
+            }
+            //Serial.println();
+
+            // save user input times in local array
+            times[i] = userTimes[i];
+          }
+        }
+
+        //Serial.print("VALIDINPUT: ");
+        //Serial.println(validInput);
+
+        if (validInput == true) {
+          // Update motor state
+          updateMotorState(M);
+
+          // Create trajectories for each joint
+          for (int i = 0; i < 6; i++) {
+            // Set initial path point
+            Tr[i]->times[0] = 0;
+            Tr[i]->positions[0] = M[i]->state.q;  //
+            Tr[i]->velocities[0] = 0;             //M[i]->state.qd.  Maybe better to set to zero? In case of a bad reading, the trajectory will be crazy...
+
+            // Set the rest of the path points
+            for (int j = 1; j <= Tr[i]->numberOfViaPoints; j++) {
+              Tr[i]->times[j] = times[j] * 1000.0;
+              Tr[i]->positions[j] = positions[j][i];
+              Tr[i]->velocities[j] = velocities[j][i];
+            }
+          }
           
-        }
+          Serial.println(times[0]);
+          Serial.println(times[1]);
+          Serial.println(times[2]);
+          Serial.println(times[3]);
+          Serial.println(positions[0][1]);
+          Serial.println(positions[1][1]);
+          Serial.println(positions[2][1]);
+          Serial.println(positions[3][1]);
+          
 
+          // Compute cubic polynomial between each via point
+          for (int i = 0; i < 6; i++) {
+            for (int j = 0; j < Tr[i]->numberOfViaPoints; j++) {
+              // Calculate duration of motion
+              duration = Tr[i]->times[j + 1] - Tr[i]->times[j];
 
+              // Compute Cubic Coefficients
+              Tr[i]->CubicCoefs[j] = getCubicCoef(duration, Tr[i]->positions[j], Tr[i]->positions[j + 1], Tr[i]->velocities[j], Tr[i]->velocities[j + 1]);
+            }
+          }
+          // Capture time of motion start
+          timeOffset = millis();
 
-
-
-        // Compute cubic polynomial between each via point
-        for (int i = 0; i < 6; i++) {
-          for (int j = 0; j < Tr[i]->numberOfViaPoints - 1; j++) {
-            // Calculate duration of motion
-            duration = Tr[i]->times[j + 1] - Tr[i]->times[j];
-
-            // Compute Cubic Coefficients
-            Tr[i]->CubicCoefs[j] = getCubicCoef(duration, Tr[i]->positions[j], Tr[i]->positions[j + 1], Tr[i]->velocities[j], Tr[i]->velocities[j + 1]);
+          //Serial.println("TIME OFFSETS");
+          // Set time offset for Polynomials
+          for (int i = 0; i < 6; i++) {
+            for (int j = 0; j <= Tr[i]->numberOfViaPoints; j++) {
+              Tr[i]->timeOffsets[j] = Tr[i]->times[j] + timeOffset;
+              //Serial.println(Tr[i]->timeOffsets[j]);
+            }
+          }
+          if (validInput == true) {
+            inMotionFlag = 1;
           }
         }
-        // Capture time of motion start
-        timeOffset = millis();
-
-        // Set time offset for Polynomials
-        for (int i = 0; i < 6; i++) {
-          for (int j = 0; j < Tr[i]->numberOfViaPoints; j++) {
-            Tr[i]->timeOffsets[j] = Tr[i]->times[j] + timeOffset;
-          }
-        }
-        inMotionFlag = 1;
-        //User input is received and trajectories can be calculated.
       }
     }
-    // If the robot is not in motion, poll for user input
-
-
     vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(1000));
   }
 }
