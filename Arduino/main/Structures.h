@@ -2,24 +2,24 @@
 #define STRUCTURES_H    // define STRUCTURES_H
 
 struct Optimizer {
-  double c1;
-  double c2;
-  double c3;
-  double c4;
-  double c5;
-  double c6;
-  double s1;
-  double s2;
-  double s3;
-  double s4;
-  double s5;
-  double s6;
-  double c1_2;
-  double c2_2;
-  double c3_2;
-  double c4_2;
-  double c5_2;
-  double c6_2;
+  float c1;
+  float c2;
+  float c3;
+  float c4;
+  float c5;
+  float c6;
+  float s1;
+  float s2;
+  float s3;
+  float s4;
+  float s5;
+  float s6;
+  float c1_2;
+  float c2_2;
+  float c3_2;
+  float c4_2;
+  float c5_2;
+  float c6_2;
 };
 
 enum MotorType {
@@ -52,30 +52,30 @@ struct Motor {
 };
 
 struct Pos {
-  double t1;
-  double t2;
-  double t3;
-  double t4;
-  double t5;
-  double t6;
+  float t1;
+  float t2;
+  float t3;
+  float t4;
+  float t5;
+  float t6;
 };
 
 struct Vel {
-  double td1;
-  double td2;
-  double td3;
-  double td4;
-  double td5;
-  double td6;
+  float td1;
+  float td2;
+  float td3;
+  float td4;
+  float td5;
+  float td6;
 };
 
 struct Acc {
-  double tdd1;
-  double tdd2;
-  double tdd3;
-  double tdd4;
-  double tdd5;
-  double tdd6;
+  float tdd1;
+  float tdd2;
+  float tdd3;
+  float tdd4;
+  float tdd5;
+  float tdd6;
 };
 
 struct CubicCoef {

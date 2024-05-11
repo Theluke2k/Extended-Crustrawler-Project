@@ -50,9 +50,10 @@ static SemaphoreHandle_t motorComms;
 // Application specific variables
 bool inMotionFlag = 0;
 bool trajectoryReadyFlag = 0;
+bool firstStartup = 1;
 extern bool validInput;
 extern bool timeoutFlag;
-uint32_t motorTimeout = 5;
+uint32_t motorTimeout = 3;
 double MX_28_Constants[4] = { 211.7, 427.4, 642.0, 115.3 };
 double MX_64_Constants[4] = { 80.9, 152.7, 224.5, 105.3 };
 double MX_106_Constants[4] = { 40.4, 83.9, 127.5, 160.6 };
@@ -123,7 +124,7 @@ void setup() {
     //Serial.println(micros() - x);
 
     dxl.torqueOff(M[i]->ID);
-    dxl.writeControlTableItem((uint8_t)RETURN_DELAY_TIME, (uint8_t)M[i]->ID, (int32_t)100, motorTimeout);
+    dxl.writeControlTableItem((uint8_t)RETURN_DELAY_TIME, (uint8_t)M[i]->ID, (int32_t)150, motorTimeout);
 
     //Serial.println(dxl.readControlTableItem(BAUD_RATE, M[i]->ID));
     dxl.setOperatingMode(M[i]->ID, OP_PWM);
@@ -193,11 +194,19 @@ void getMotorState(Motor* M, int sensitivity) {
 //
 void updateMotorState(Motor* M[6]) {
   for (int i = 0; i < 2; i++) {
-    getMotorState(M[i], 10);
-    if (timeoutFlag) {
-      return;
+    if (firstStartup) {
+      getMotorState(M[i], 10000);
+      if (timeoutFlag) {
+        return;
+      }
+    } else {
+      getMotorState(M[i], 10);
+      if (timeoutFlag) {
+        return;
+      }
     }
   }
+  firstStartup = 0;
 }
 
 BLA::Matrix<6> getCurrentPositionVector(Motor* M[6]) {
@@ -219,7 +228,7 @@ BLA::Matrix<6> getCurrentVelocityVector(Motor* M[6]) {
 /*
   Inlining the functions eliminates function overhead and allows for the compiler to be more aggressive and thus optimizing the function. However, it increases the size of the binary
 */
-__attribute__((always_inline)) void get_Cqd(double Arr[6], Pos* p, Vel* v, Optimizer* o) {
+__attribute__((always_inline)) void get_Cqd(float Arr[6], Pos* p, Vel* v, Optimizer* o) {
   Arr[0] = get_Cqd1(p, v, o);
   Arr[1] = get_Cqd2(p, v, o);
   Arr[2] = get_Cqd3(p, v, o);
@@ -227,7 +236,7 @@ __attribute__((always_inline)) void get_Cqd(double Arr[6], Pos* p, Vel* v, Optim
   Arr[4] = get_Cqd5(p, v, o);
   Arr[5] = get_Cqd6(p, v, o);
 }
-__attribute__((always_inline)) void get_g(double Arr[6], Pos* p, Optimizer* o) {
+__attribute__((always_inline)) void get_g(float Arr[6], Pos* p, Optimizer* o) {
   Arr[0] = get_g1(p, o);
   Arr[1] = get_g2(p, o);
   Arr[2] = get_g3(p, o);
@@ -235,7 +244,7 @@ __attribute__((always_inline)) void get_g(double Arr[6], Pos* p, Optimizer* o) {
   Arr[4] = get_g5(p, o);
   Arr[5] = get_g6(p, o);
 }
-__attribute__((always_inline)) void get_Bqdd(double Arr[6], Pos* p, Acc* a, Optimizer* o) {
+__attribute__((always_inline)) void get_Bqdd(float Arr[6], Pos* p, Acc* a, Optimizer* o) {
   Arr[0] = get_Bqdd1(p, a, o);
   Arr[1] = get_Bqdd2(p, a, o);
   Arr[2] = get_Bqdd3(p, a, o);
@@ -445,7 +454,7 @@ void ControlTask(void* pvParameters) {
   TickType_t lastWakeTime = xTaskGetTickCount();
 
   // Controller Parameters
-  double w_n[6] = { 6, 6, 5, 5, 5, 5 };  // natural frequency of system
+  double w_n[6] = { 10, 10, 5, 5, 5, 5 };  // natural frequency of system
   double z_n[6] = { 1, 1, 1, 1, 1, 1 };  // damping ratio of system
 
   // General Variables
@@ -460,9 +469,9 @@ void ControlTask(void* pvParameters) {
   Optimizer opt;
 
   // Arrays for joint variables for computational efficiency
-  double CqdArr[6] = { 0, 0, 0, 0, 0, 0 };
-  double gArr[6] = { 0, 0, 0, 0, 0, 0 };
-  double BqddArr[6] = { 0, 0, 0, 0, 0, 0 };
+  float CqdArr[6] = { 0, 0, 0, 0, 0, 0 };
+  float gArr[6] = { 0, 0, 0, 0, 0, 0 };
+  float BqddArr[6] = { 0, 0, 0, 0, 0, 0 };
 
   // Define Vectors
   BLA::Matrix<6> q = { 0, 0, 0, 0, 0, 0 };
@@ -492,12 +501,12 @@ void ControlTask(void* pvParameters) {
 
   while (1) {
     duration = micros();
-
     timeoutFlag = 0;
     // Read position and velocity of the motor
     updateMotorState(M);
 
     if (inMotionFlag && !timeoutFlag) {
+      
       // Insert motor state in vector
       q = getCurrentPositionVector(M);
       qd = getCurrentVelocityVector(M);
@@ -520,7 +529,7 @@ void ControlTask(void* pvParameters) {
         Cqd(i) = CqdArr[i];
         g(i) = gArr[i];
       }
-
+      
       //Serial << "Cqd: " << Cqd << '\n';
       //Serial << "g: " << g << '\n';
 
@@ -539,18 +548,24 @@ void ControlTask(void* pvParameters) {
             qdd_d(j) = getDesiredJointAcceleration(inputTime, Tr[j]->CubicCoefs[i - 1]);
           }
           break;  // To prevent the loop executing the next cubic before time
+        } else if (millis() > (Tr1.timeOffsets[Tr1.numberOfViaPoints] + 5000)) {
+          Serial.println(millis());
+          Serial.println(millis());
+          Serial.println(Tr1.timeOffsets[Tr1.numberOfViaPoints]);
+          Serial.println(Tr1.timeOffsets[Tr1.numberOfViaPoints + 1]);
+          inMotionFlag = 0;
         }
       }
 
       Serial << "q_d: " << q_d << '\n';
-      Serial << "qd_d: " << qd_d << '\n';
+      //Serial << "qd_d: " << qd_d << '\n';
 
       // Calculate control signal error
       q_e = q_d - q;
       qd_e = qd_d - qd;
 
       Serial << "q_e: " << q_e << '\n';
-      Serial << "qd_e: " << qd_e << '\n';
+      //Serial << "qd_e: " << qd_e << '\n';
 
       // Caluclate input to B(q)y block
       y = Kp * q_e + Kd * qd_e + qdd_d;
@@ -569,18 +584,20 @@ void ControlTask(void* pvParameters) {
       tau = Bqdd + Cqd + g;
 
       Serial << "tau: " << tau << '\n';
-      
+
       // Update the motor input depending on the operating mode
       updateMotorInput(tau, g);
+
 
     } else if (timeoutFlag) {
       Serial.println("TIMEOUT DETECTED");
     }
 
     Serial.println(micros() - duration);
+
     Serial.println();
 
-    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(40));
+    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(30));
   }
 }
 
@@ -645,7 +662,7 @@ void TrajectoryPlanner(void* pvParameters) {
               if (q(k) <= -3.14 && q(k) >= -3.15) {
                 q(k) = PI;
               }
-            }/*
+            } /*
             Serial.println("LIIMTS: ");
             Serial.println(q(j));
             Serial.println(M[j]->higherLimit);
@@ -715,7 +732,7 @@ void TrajectoryPlanner(void* pvParameters) {
               Tr[i]->velocities[j] = velocities[j][i];
             }
           }
-          
+
           Serial.println(times[0]);
           Serial.println(times[1]);
           Serial.println(times[2]);
@@ -724,7 +741,7 @@ void TrajectoryPlanner(void* pvParameters) {
           Serial.println(positions[1][1]);
           Serial.println(positions[2][1]);
           Serial.println(positions[3][1]);
-          
+
 
           // Compute cubic polynomial between each via point
           for (int i = 0; i < 6; i++) {
