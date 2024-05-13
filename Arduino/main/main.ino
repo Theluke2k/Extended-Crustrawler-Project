@@ -77,8 +77,8 @@ float userTimes[100] = { 0 };
 */
 
 // Initialize motors (ID;TYPE;MODEL;OPERATINGMODE;OFFSET)
-Motor M1(10, MX_64, 311, OP_PWM, -3.15, 3.15, -1030.0);
-Motor M2(11, MX_106, 321, OP_PWM, -0.1, 3.15, -1029.0);
+Motor M1(1, MX_64, 311, OP_PWM, -3.15, 3.15, -1030.0);
+Motor M2(2, MX_106, 321, OP_PWM, -0.434117578, 3.548105859, -1029.0);
 Motor M3(3, MX_106, 321, OP_PWM, -0.1, 3.15, -942.0);
 Motor M4(4, MX_28, 30, OP_PWM, -3.15, 3.15, -978.0);
 Motor M5(5, MX_64, 311, OP_PWM, -3.15 / 2, 3.15 / 2, -2020.0);
@@ -134,6 +134,7 @@ void setup() {
     Serial.println(i);
     Serial.println(dxl.readControlTableItem((uint8_t)OPERATING_MODE, (uint8_t)M[i]->ID, motorTimeout));
     Serial.println(dxl.readControlTableItem((uint8_t)RETURN_DELAY_TIME, (uint8_t)M[i]->ID, motorTimeout));
+    Serial.println(dxl.readControlTableItem((uint8_t)PRESENT_POSITION, (uint8_t)M[i]->ID, motorTimeout));
 
     dxl.torqueOn(M[i]->ID);
   }
@@ -193,7 +194,7 @@ void getMotorState(Motor* M, int sensitivity) {
 
 //
 void updateMotorState(Motor* M[6]) {
-  for (int i = 0; i < 2; i++) {
+  for (int i = 0; i < 6; i++) {
     if (firstStartup) {
       getMotorState(M[i], 10000);
       if (timeoutFlag) {
@@ -299,7 +300,7 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
   int motorType = 0;
   double input_test = 0;
 
-  for (int i = 0; i < 2; i++) {
+  for (int i = 0; i < 6; i++) {
     // Do nothing if a timeout was indicated
     if (!timeoutFlag) {
       // Chech the operating mode of the motor
@@ -333,6 +334,8 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
           input_test = tau(i) * motorConstants[motorType][1] + M[i]->state.qd * motorConstants[motorType][3];
         }
 
+        input_test = tau(i) * motorConstants[motorType][1] + M[i]->state.qd * motorConstants[motorType][3];
+
         // Limit the PWM value
         if (input_test > 885) {
           input_test = 885;
@@ -342,8 +345,8 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
         }
 
         M[i]->input = input_test;
-        Serial.print("PWM: ");
-        Serial.println(M[i]->input);
+        //Serial.print("PWM: ");
+        //Serial.println(M[i]->input);
         // Write the new PWM value to the motor
         xSemaphoreTake(motorComms, 1000);
         dxl.writeControlTableItem((uint8_t)GOAL_PWM, (uint8_t)M[i]->ID, (int32_t)M[i]->input, motorTimeout);
@@ -454,7 +457,7 @@ void ControlTask(void* pvParameters) {
   TickType_t lastWakeTime = xTaskGetTickCount();
 
   // Controller Parameters
-  double w_n[6] = { 10, 10, 5, 5, 5, 5 };  // natural frequency of system
+  double w_n[6] = { 5, 5, 5, 5, 10, 5 };  // natural frequency of system
   double z_n[6] = { 1, 1, 1, 1, 1, 1 };  // damping ratio of system
 
   // General Variables
@@ -548,7 +551,7 @@ void ControlTask(void* pvParameters) {
             qdd_d(j) = getDesiredJointAcceleration(inputTime, Tr[j]->CubicCoefs[i - 1]);
           }
           break;  // To prevent the loop executing the next cubic before time
-        } else if (millis() > (Tr1.timeOffsets[Tr1.numberOfViaPoints] + 5000)) {
+        } else if (millis() > (Tr1.timeOffsets[Tr1.numberOfViaPoints] + 10000)) {
           Serial.println(millis());
           Serial.println(millis());
           Serial.println(Tr1.timeOffsets[Tr1.numberOfViaPoints]);
@@ -597,7 +600,7 @@ void ControlTask(void* pvParameters) {
 
     Serial.println();
 
-    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(30));
+    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(40));
   }
 }
 
