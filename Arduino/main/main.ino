@@ -80,8 +80,8 @@ float MX_64_motorConstant = 1.156;
 */
 
 // Initialize motors (ID;TYPE;MODEL;OPERATINGMODE;OFFSET)
-Motor M1(1, MX_64, 311, OP_PWM, -2 * PI, 2 * PI, -1030.0);
-Motor M2(2, MX_106, 321, OP_PWM, -0.434117578, 3.548105859, -1029.0);
+Motor M1(10, MX_64, 311, OP_CURRENT, -2 * PI, 2 * PI, -1030.0);
+Motor M2(11, MX_106, 321, OP_CURRENT, -0.434117578, 3.548105859, -1029.0);
 Motor M3(3, MX_106, 321, OP_PWM, -0.398835938, 3.592591406, -942.0);
 Motor M4(4, MX_28, 30, OP_PWM, -2 * PI, 2 * PI, -978.0);
 Motor M5(5, MX_64, 311, OP_PWM, -1.951228125, 2.029461328, -2020.0);
@@ -98,6 +98,39 @@ Trajectory Tr5(10);
 Trajectory Tr6(10);
 
 Trajectory* Tr[6] = { &Tr1, &Tr2, &Tr3, &Tr4, &Tr5, &Tr6 };
+
+// Bulk read setup
+const uint8_t DXL_ID_CNT = 2;  // Number of motors
+const uint16_t BUF_SIZE = 128;
+uint8_t user_pkt_buf[BUF_SIZE];
+
+struct BrDataXel1 {
+  int16_t present_current;
+  int32_t present_velocity;
+} __attribute__((packed));
+
+struct BrDataXel2 {
+  int32_t present_position;
+} __attribute__((packed));
+
+struct BwDataXel1 {
+  int32_t goal_velocity;
+} __attribute__((packed));
+
+struct BwDataXel2 {
+  int32_t goal_position;
+} __attribute__((packed));
+
+
+BrDataXel1 br_data_xel_1;
+BrDataXel2 br_data_xel_2;
+DYNAMIXEL::InfoBulkReadInst_t br_infos;
+DYNAMIXEL::XELInfoBulkRead_t info_xels_br[DXL_ID_CNT];
+
+BwDataXel1 bw_data_xel_1;
+BwDataXel2 bw_data_xel_2;
+DYNAMIXEL::InfoBulkWriteInst_t bw_infos;
+DYNAMIXEL::XELInfoBulkWrite_t info_xels_bw[DXL_ID_CNT];
 
 void setup() {
   Serial.begin(2000000);
@@ -120,6 +153,7 @@ void setup() {
   for (int i = 0; i < 6; i++) {
     Serial.print("Ping: ");
     Serial.println(dxl.ping(M[i]->ID));
+    
 
     // Serial.println("Calling Function...");
     //x = micros();
@@ -127,10 +161,17 @@ void setup() {
     //Serial.println(micros() - x);
 
     dxl.torqueOff(M[i]->ID);
-    dxl.writeControlTableItem((uint8_t)RETURN_DELAY_TIME, (uint8_t)M[i]->ID, (int32_t)150, motorTimeout);
+    dxl.writeControlTableItem((uint8_t)RETURN_DELAY_TIME, (uint8_t)M[i]->ID, (int32_t)80, motorTimeout);
+    //dxl.setBaudrate(M[i]->ID, 4500000);
+    dxl.setOperatingMode(M[i]->ID, M[i]->mode);
 
     //Serial.println(dxl.readControlTableItem(BAUD_RATE, M[i]->ID));
-    dxl.setOperatingMode(M[i]->ID, OP_PWM);
+    if (M[i]->mode == OP_CURRENT) {
+      dxl.writeControlTableItem((uint8_t)GOAL_PWM, (uint8_t)M[i]->ID, (int32_t)200, motorTimeout);
+    }
+    if (M[i]->mode == OP_PWM) {
+      dxl.writeControlTableItem((uint8_t)GOAL_CURRENT, (uint8_t)M[i]->ID, (int32_t)2047, motorTimeout);
+    }
 
     // Print info
     Serial.print("Motor");
@@ -142,6 +183,103 @@ void setup() {
     dxl.torqueOn(M[i]->ID);
   }
 
+  br_infos.packet.p_buf = user_pkt_buf;
+  br_infos.packet.buf_capacity = BUF_SIZE;
+  br_infos.packet.is_completed = false;
+  br_infos.p_xels = info_xels_br;
+
+  info_xels_br[0].id = 10;
+  info_xels_br[0].addr = 126;           // Present Current
+  info_xels_br[0].addr_length = 2 + 4;  // Present Current + Present Velocity
+  info_xels_br[0].p_recv_buf = (uint8_t*)&br_data_xel_1;
+
+  info_xels_br[1].id = 11;
+  info_xels_br[1].addr = 132;       // Present Position
+  info_xels_br[1].addr_length = 4;  // Present Position + Present Velocity
+  info_xels_br[1].p_recv_buf = (uint8_t*)&br_data_xel_2;
+
+  br_infos.xel_count = DXL_ID_CNT;
+  br_infos.is_info_changed = true;
+
+  bw_infos.packet.p_buf = nullptr;
+  bw_infos.packet.is_completed = false;
+  bw_infos.p_xels = info_xels_bw;
+
+  bw_data_xel_1.goal_velocity = 0;
+  info_xels_bw[0].id = 10;
+  info_xels_bw[0].addr = 104;       // Goal Velocity of X serise.
+  info_xels_bw[0].addr_length = 4;  // Goal Velocity
+  info_xels_bw[0].p_data = (uint8_t*)&bw_data_xel_1;
+
+  bw_data_xel_2.goal_position = 0;
+  info_xels_bw[1].id = 11;
+  info_xels_bw[1].addr = 116;       // Goal Position of X serise.
+  info_xels_bw[1].addr_length = 4;  // Goal Position
+  info_xels_bw[1].p_data = (uint8_t*)&bw_data_xel_2;
+
+  bw_infos.xel_count = DXL_ID_CNT;
+  bw_infos.is_info_changed = true;
+
+  static uint32_t try_count = 0;
+
+  bw_data_xel_1.goal_velocity += 5;
+  if (bw_data_xel_1.goal_velocity >= 200)
+    bw_data_xel_1.goal_velocity = 0;
+  bw_data_xel_2.goal_position += 255;
+  if (bw_data_xel_2.goal_position >= 1023)
+    bw_data_xel_2.goal_position = 0;
+  bw_infos.is_info_changed = true;
+
+  Serial.print("\n>>>>>> Bulk Instruction Test : ");
+  Serial.println(try_count++);
+  if (true == dxl.bulkWrite(&bw_infos)) {
+    Serial.println("[BulkWrite] Success");
+    Serial.print("  ID: ");
+    Serial.println(bw_infos.p_xels[0].id);
+    Serial.print("\t Goal Velocity: ");
+    Serial.println(bw_data_xel_1.goal_velocity);
+    Serial.print("  ID: ");
+    Serial.println(bw_infos.p_xels[1].id);
+    Serial.print("\t Goal Position: ");
+    Serial.println(bw_data_xel_2.goal_position);
+  } else {
+    Serial.print("[BulkWrite] Fail, Lib error code: ");
+    Serial.print(dxl.getLastLibErrCode());
+  }
+  Serial.println();
+
+  delay(250);
+
+  // Transmit predefined fastBulkRead instruction packet
+  // and receive a status packet from each DYNAMIXEL
+  uint8_t recv_cnt = dxl.fastBulkRead(&br_infos);
+  if (recv_cnt > 0) {
+    Serial.print("[fastBulkRead] Success, Received ID Count: ");
+    Serial.println(recv_cnt);
+
+    Serial.print("  ID: ");
+    Serial.print(br_infos.p_xels[0].id);
+    Serial.print(", Error: ");
+    Serial.println(br_infos.p_xels[0].error);
+    Serial.print("\t Present Current: ");
+    Serial.println(br_data_xel_1.present_current);
+    Serial.print("\t Present Velocity: ");
+    Serial.println(br_data_xel_1.present_velocity);
+
+    Serial.print("  ID: ");
+    Serial.print(br_infos.p_xels[1].id);
+    Serial.print(", Error: ");
+    Serial.println(br_infos.p_xels[1].error);
+    Serial.print("\t Present Position: ");
+    Serial.println(br_data_xel_2.present_position);
+  } else {
+    Serial.print("[fastBulkRead] Fail, Lib error code: ");
+    Serial.println(dxl.getLastLibErrCode());
+  }
+  Serial.println("=======================================================");
+
+  delay(750);
+
   // Semaphore Creation
   motorComms = xSemaphoreCreateMutex();
 
@@ -149,8 +287,8 @@ void setup() {
   //BLA::Matrix<6> h = InverseKinematics(-0.4207, -0.4207, 0.157, g, 1, 1);
 
   // Task Creation
-  xTaskCreate(ControlTask, "Control Task", 50000, NULL, 2, NULL);
-  xTaskCreate(TrajectoryPlanner, "Trajectory Planner", 50000, NULL, 1, NULL);
+  //xTaskCreate(ControlTask, "Control Task", 50000, NULL, 2, NULL);
+  //xTaskCreate(TrajectoryPlanner, "Trajectory Planner", 50000, NULL, 1, NULL);
 }
 
 /* ----- GENERAL FUNCTIONS -----*/
@@ -197,7 +335,7 @@ void getMotorState(Motor* M, int sensitivity) {
 
 //
 void updateMotorState(Motor* M[6]) {
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < 1; i++) {
     if (firstStartup) {
       getMotorState(M[i], 10000);
       if (timeoutFlag) {
@@ -302,22 +440,47 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
   double C1, C2 = 0;
   int motorType = 0;
   double input_test = 0;
+  float nullSpace = 0.005;
+  float currentLimit = 0;
 
-  for (int i = 0; i < 6; i++) {
+  for (int i = 0; i < 1; i++) {
     // Do nothing if a timeout was indicated
     if (!timeoutFlag) {
       // Chech the operating mode of the motor
       if (M[i]->mode == OP_CURRENT) {
-        Serial.println(M[i]->mode);
         if (M[i]->type == MX_106) {
-          M[i]->input = tau(i) * 133.33;
+          currentLimit = 2047;
+          if (tau(i) > nullSpace) {
+            input_test = tau(i) * 210.02 + 4.0649;
+          } else if (tau(i) < -nullSpace) {
+            input_test = tau(i) * 210.02 - 4.0649;
+          } else {
+            input_test = 0;
+          }
         } else if (M[i]->type == MX_64) {
-          M[i]->input = tau(i) * 172.41;
+          currentLimit = 1941;
+          if (tau(i) > nullSpace) {
+            input_test = tau(i) * 257.37 + 26.777;
+          } else if (tau(i) < -nullSpace) {
+            input_test = tau(i) * 257.37 - 26.777;
+          } else {
+            input_test = 0;
+          }
         } else if (M[i]->type == MX_28) {
           Serial.println("INVALID MOTOR TYPE FOR CURRENT CONTROL");
         }
-        Serial.print("Writing current value: ");
+
+        if (input_test > currentLimit) {
+          input_test = currentLimit;
+        }
+        if (input_test < -currentLimit) {
+          input_test = -currentLimit;
+        }
+
+        M[i]->input = input_test;
+        Serial.print("Motor input: ");
         Serial.println(M[i]->input);
+
         // Write new current value to the motor
         xSemaphoreTake(motorComms, 1000);
         dxl.writeControlTableItem((uint8_t)GOAL_CURRENT, (uint8_t)M[i]->ID, (int32_t)M[i]->input, motorTimeout);
@@ -478,8 +641,8 @@ void ControlTask(void* pvParameters) {
   TickType_t lastWakeTime = xTaskGetTickCount();
 
   // Controller Parameters
-  double w_n[6] = { 6, 6, 7, 10, 7, 10 };              // natural frequency of system
-  double z_n[6] = { 0.9, 0.9, 0.9, 0.9, 0.9, 0.9 };  // damping ratio of system
+  double w_n[6] = { 1, 1, 1, 1, 1, 1 };    // natural frequency of system
+  double z_n[6] = { 0.1, 1, 1, 1, 1, 1 };  // damping ratio of system
 
   // General Variables
   double timeCapture = 0;
@@ -505,6 +668,11 @@ void ControlTask(void* pvParameters) {
   BLA::Matrix<6> Bqdd = { 0, 0, 0, 0, 0, 0 };
   BLA::Matrix<6> y = { 0, 0, 0, 0, 0, 0 };
   BLA::Matrix<6> tau = { 0, 0, 0, 0, 0, 0 };
+
+  // To check values
+  BLA::Matrix<6> y1 = { 0, 0, 0, 0, 0, 0 };
+  BLA::Matrix<6> y2 = { 0, 0, 0, 0, 0, 0 };
+  BLA::Matrix<6> y3 = { 0, 0, 0, 0, 0, 0 };
 
   // Control system Reference
   BLA::Matrix<6> q_d = { 0, 0, 0, 0, 0, 0 };
@@ -535,8 +703,8 @@ void ControlTask(void* pvParameters) {
       q = getCurrentPositionVector(M);
       qd = getCurrentVelocityVector(M);
 
-      //Serial << "q: " << q << '\n';
-      //Serial << "qd: " << qd << '\n';
+      Serial << "q: " << q << '\n';
+      Serial << "qd: " << qd << '\n';
 
       // Define some structs for computational optimization
       q_op = { q(0), q(1), q(2), q(3), q(4), q(5) };
@@ -554,8 +722,8 @@ void ControlTask(void* pvParameters) {
         g(i) = gArr[i];
       }
 
-      //Serial << "Cqd: " << Cqd << '\n';
-      //Serial << "g: " << g << '\n';
+      Serial << "Cqd: " << Cqd << '\n';
+      Serial << "g: " << g << '\n';
 
       // Capture current time
       timeCapture = millis();
@@ -582,14 +750,14 @@ void ControlTask(void* pvParameters) {
       }
 
       Serial << "q_d: " << q_d << '\n';
-      //Serial << "qd_d: " << qd_d << '\n';
+      Serial << "qd_d: " << qd_d << '\n';
 
       // Calculate control signal error
       q_e = q_d - q;
       qd_e = qd_d - qd;
 
       Serial << "q_e: " << q_e << '\n';
-      //Serial << "qd_e: " << qd_e << '\n';
+      Serial << "qd_e: " << qd_e << '\n';
 
       // Caluclate input to B(q)y block
       y = Kp * q_e + Kd * qd_e + qdd_d;
@@ -601,11 +769,20 @@ void ControlTask(void* pvParameters) {
         Bqdd(i) = BqddArr[i];
       }
 
-      //Serial << "y: " << y << '\n';
-      //Serial << "Bqdd: " << Bqdd << '\n';
+      y1 = Kp * q_e;
+      y2 = Kd * qd_e;
+      Serial << "y1: " << y1 << '\n';
+      Serial << "y2: " << y2 << '\n';
+      Serial << "y: " << y << '\n';
+      Serial << "Bqdd: " << Bqdd << '\n';
 
       // Calculate required torque of motors
       tau = Bqdd + Cqd + g;
+      for (int i = 0; i < 6; i++) {
+        if (q_e(i) < 0.05 && q_e(i) > -0.05) {
+          tau(i) = 0;
+        }
+      }
 
       Serial << "tau: " << tau << '\n';
 
@@ -621,7 +798,7 @@ void ControlTask(void* pvParameters) {
 
     Serial.println();
 
-    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(36));
+    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(35));
   }
 }
 
