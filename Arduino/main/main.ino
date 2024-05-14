@@ -61,6 +61,9 @@ double* motorConstants[] = { MX_28_Constants, MX_64_Constants, MX_106_Constants 
 float userPositions[100][6] = { 0 };
 float userTimes[100] = { 0 };
 
+float MX_64_motorConstant = 1.156;
+//float MX_64_motorConstant = 1.156;
+
 /*
   Motor 1: 1030, 1
   Motor 2: 1029, 1
@@ -77,22 +80,22 @@ float userTimes[100] = { 0 };
 */
 
 // Initialize motors (ID;TYPE;MODEL;OPERATINGMODE;OFFSET)
-Motor M1(1, MX_64, 311, OP_PWM, -3.15, 3.15, -1030.0);
+Motor M1(1, MX_64, 311, OP_PWM, -2 * PI, 2 * PI, -1030.0);
 Motor M2(2, MX_106, 321, OP_PWM, -0.434117578, 3.548105859, -1029.0);
-Motor M3(3, MX_106, 321, OP_PWM, -0.1, 3.15, -942.0);
-Motor M4(4, MX_28, 30, OP_PWM, -3.15, 3.15, -978.0);
-Motor M5(5, MX_64, 311, OP_PWM, -3.15 / 2, 3.15 / 2, -2020.0);
-Motor M6(6, MX_28, 30, OP_PWM, -3.15, 3.15, -3458.0);
+Motor M3(3, MX_106, 321, OP_PWM, -0.398835938, 3.592591406, -942.0);
+Motor M4(4, MX_28, 30, OP_PWM, -2 * PI, 2 * PI, -978.0);
+Motor M5(5, MX_64, 311, OP_PWM, -1.951228125, 2.029461328, -2020.0);
+Motor M6(6, MX_28, 30, OP_PWM, -2 * PI, 2 * PI, -3458.0);
 
 Motor* M[6] = { &M1, &M2, &M3, &M4, &M5, &M6 };
 
 // Initialize Trajectory planner with number of via points
-Trajectory Tr1(3);
-Trajectory Tr2(3);
-Trajectory Tr3(3);
-Trajectory Tr4(3);
-Trajectory Tr5(3);
-Trajectory Tr6(3);
+Trajectory Tr1(10);
+Trajectory Tr2(10);
+Trajectory Tr3(10);
+Trajectory Tr4(10);
+Trajectory Tr5(10);
+Trajectory Tr6(10);
 
 Trajectory* Tr[6] = { &Tr1, &Tr2, &Tr3, &Tr4, &Tr5, &Tr6 };
 
@@ -146,8 +149,8 @@ void setup() {
   //BLA::Matrix<6> h = InverseKinematics(-0.4207, -0.4207, 0.157, g, 1, 1);
 
   // Task Creation
-  xTaskCreate(ControlTask, "Control Task", 40000, NULL, 1, NULL);
-  xTaskCreate(TrajectoryPlanner, "Trajectory Planner", 30000, NULL, 1, NULL);
+  xTaskCreate(ControlTask, "Control Task", 50000, NULL, 2, NULL);
+  xTaskCreate(TrajectoryPlanner, "Trajectory Planner", 50000, NULL, 1, NULL);
 }
 
 /* ----- GENERAL FUNCTIONS -----*/
@@ -325,7 +328,7 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
           else if: assisted by gravity.
           else: not affected by gravity.
         */
-
+        /*
         if (((tau(i) < 0) && (g(i) < 0)) || ((tau(i) > 0) && (g(i) > 0))) {
           input_test = tau(i) * motorConstants[motorType][2] + M[i]->state.qd * motorConstants[motorType][3];
         } else if (((tau(i) < 0) && (g(i) > 0)) || ((tau(i) > 0) && (g(i) < 0))) {
@@ -333,8 +336,26 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
         } else {
           input_test = tau(i) * motorConstants[motorType][1] + M[i]->state.qd * motorConstants[motorType][3];
         }
+*/
+        //input_test = tau(i) * motorConstants[motorType][1] + M[i]->state.qd * motorConstants[motorType][3];
 
-        input_test = tau(i) * motorConstants[motorType][1] + M[i]->state.qd * motorConstants[motorType][3];
+        if (tau(i) < 0) {
+          if (M[i]->state.qd < 0) {
+            input_test = tau(i) * motorConstants[motorType][2] + M[i]->state.qd * motorConstants[motorType][3];
+          } else if (M[i]->state.qd == 0) {
+            input_test = tau(i) * motorConstants[motorType][1] + M[i]->state.qd * motorConstants[motorType][3];
+          } else {
+            input_test = tau(i) * motorConstants[motorType][0] + M[i]->state.qd * motorConstants[motorType][3];
+          }
+        } else {
+          if (M[i]->state.qd < 0) {
+            input_test = tau(i) * motorConstants[motorType][0] + M[i]->state.qd * motorConstants[motorType][3];
+          } else if (M[i]->state.qd == 0) {
+            input_test = tau(i) * motorConstants[motorType][1] + M[i]->state.qd * motorConstants[motorType][3];
+          } else {
+            input_test = tau(i) * motorConstants[motorType][2] + M[i]->state.qd * motorConstants[motorType][3];
+          }
+        }
 
         // Limit the PWM value
         if (input_test > 885) {
@@ -414,12 +435,12 @@ uint8_t UserInputListener() {
     }
 
     Serial.println("PRINT CHECK");
-    for (int i = 1; i < arrayIndex; i++) {
+    for (int i = 0; i < 6; i++) {
       Serial.println(userTimes[i]);
       for (int j = 0; j < 6; j++) {
         Serial.println(userPositions[i][j]);
-        Tr[i]->numberOfViaPoints = arrayIndex - 1;
       }
+      Tr[i]->numberOfViaPoints = arrayIndex - 1;
     }
 
     return 1;
@@ -457,8 +478,8 @@ void ControlTask(void* pvParameters) {
   TickType_t lastWakeTime = xTaskGetTickCount();
 
   // Controller Parameters
-  double w_n[6] = { 5, 5, 5, 5, 10, 5 };  // natural frequency of system
-  double z_n[6] = { 1, 1, 1, 1, 1, 1 };  // damping ratio of system
+  double w_n[6] = { 6, 6, 7, 10, 7, 10 };              // natural frequency of system
+  double z_n[6] = { 0.9, 0.9, 0.9, 0.9, 0.9, 0.9 };  // damping ratio of system
 
   // General Variables
   double timeCapture = 0;
@@ -509,7 +530,7 @@ void ControlTask(void* pvParameters) {
     updateMotorState(M);
 
     if (inMotionFlag && !timeoutFlag) {
-      
+
       // Insert motor state in vector
       q = getCurrentPositionVector(M);
       qd = getCurrentVelocityVector(M);
@@ -532,7 +553,7 @@ void ControlTask(void* pvParameters) {
         Cqd(i) = CqdArr[i];
         g(i) = gArr[i];
       }
-      
+
       //Serial << "Cqd: " << Cqd << '\n';
       //Serial << "g: " << g << '\n';
 
@@ -600,7 +621,7 @@ void ControlTask(void* pvParameters) {
 
     Serial.println();
 
-    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(40));
+    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(36));
   }
 }
 
@@ -665,57 +686,67 @@ void TrajectoryPlanner(void* pvParameters) {
               if (q(k) <= -3.14 && q(k) >= -3.15) {
                 q(k) = PI;
               }
-            } /*
-            Serial.println("LIIMTS: ");
+            }
+            Serial.print("i,j: ");
+            Serial.print(i);
+            Serial.print(", ");
+            Serial.println(j);
+            Serial.print("choice1,choice2: ");
+            Serial.print(choice1);
+            Serial.print(", ");
+            Serial.println(choice2);
+            Serial.println("Limits: ");
             Serial.println(q(j));
             Serial.println(M[j]->higherLimit);
             Serial.println(M[j]->lowerLimit);
-*/
+
             // Check validity of solution
             if (q(j) > M[j]->higherLimit || q(j) < M[j]->lowerLimit || isnan(q(j))) {
-              if (j < 3) {
-                if (choice1 < 3) {
-                  j = 0;
-                  choice1++;
-                  continue;
-                } else {
-                  validInput = false;
-                  Serial.println("No valid solution was found for the position within the manipulator limits!");
-                  break;
-                }
+              if (choice1 < 4) {
+                j = -1;
+                choice1++;
+                continue;
               } else {
-                if (choice2 < 2) {
-                  j = 0;
-                  choice2++;
-                  continue;
-                } else {
-                  validInput = false;
-                  Serial.println("No valid solution was found for the orientation within the manipulator limits!");
-                  break;
-                }
+                validInput = false;
+                Serial.println("No valid solution was found for the position within the manipulator limits!");
+                break;
+              }
+              if (choice2 < 2) {
+                j = -1;
+                choice1 = 1;
+                choice2++;
+                continue;
+              } else {
+                validInput = false;
+                Serial.println("No valid solution was found for the orientation within the manipulator limits!");
+                break;
               }
             }
           }
           if (validInput) {
-            /*
+
             Serial.println("Found solution: ");
             Serial.println(choice1);
             Serial.println(choice2);
-*/
+
             // If a valid solution was found, save the via points in a local array
             for (int j = 0; j < 6; j++) {
               positions[i][j] = q(j);
-              //Serial.println(positions[i][j]);
+              Serial.println(positions[i][j]);
             }
-            //Serial.println();
+            Serial.println();
 
             // save user input times in local array
             times[i] = userTimes[i];
+          } else {
+            Serial.print("No solution was found for via point ");
+            Serial.println(i);
+            break;
           }
         }
 
-        //Serial.print("VALIDINPUT: ");
-        //Serial.println(validInput);
+        Serial.print("VALIDINPUT: ");
+        Serial.println(validInput);
 
         if (validInput == true) {
           // Update motor state
@@ -727,10 +758,11 @@ void TrajectoryPlanner(void* pvParameters) {
             Tr[i]->times[0] = 0;
             Tr[i]->positions[0] = M[i]->state.q;  //
             Tr[i]->velocities[0] = 0;             //M[i]->state.qd.  Maybe better to set to zero? In case of a bad reading, the trajectory will be crazy...
-
+            Serial.println("SET PATH POINTS");
             // Set the rest of the path points
             for (int j = 1; j <= Tr[i]->numberOfViaPoints; j++) {
               Tr[i]->times[j] = times[j] * 1000.0;
+              Serial.println(Tr[i]->times[j]);
               Tr[i]->positions[j] = positions[j][i];
               Tr[i]->velocities[j] = velocities[j][i];
             }
@@ -740,11 +772,15 @@ void TrajectoryPlanner(void* pvParameters) {
           Serial.println(times[1]);
           Serial.println(times[2]);
           Serial.println(times[3]);
+          Serial.println(times[4]);
+          Serial.println(times[5]);
+
           Serial.println(positions[0][1]);
           Serial.println(positions[1][1]);
           Serial.println(positions[2][1]);
           Serial.println(positions[3][1]);
-
+          Serial.println(positions[4][1]);
+          Serial.println(positions[5][1]);
 
           // Compute cubic polynomial between each via point
           for (int i = 0; i < 6; i++) {
@@ -759,12 +795,12 @@ void TrajectoryPlanner(void* pvParameters) {
           // Capture time of motion start
           timeOffset = millis();
 
-          //Serial.println("TIME OFFSETS");
+          Serial.println("TIME OFFSETS");
           // Set time offset for Polynomials
           for (int i = 0; i < 6; i++) {
             for (int j = 0; j <= Tr[i]->numberOfViaPoints; j++) {
               Tr[i]->timeOffsets[j] = Tr[i]->times[j] + timeOffset;
-              //Serial.println(Tr[i]->timeOffsets[j]);
+              Serial.println(Tr[i]->timeOffsets[j]);
             }
           }
           if (validInput == true) {
