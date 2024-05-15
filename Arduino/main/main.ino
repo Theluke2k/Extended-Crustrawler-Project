@@ -80,8 +80,8 @@ float MX_64_motorConstant = 1.156;
 */
 
 // Initialize motors (ID;TYPE;MODEL;OPERATINGMODE;OFFSET)
-Motor M1(10, MX_64, 311, OP_PWM, -2 * PI, 2 * PI, -1030.0);
-Motor M2(11, MX_106, 321, OP_PWM, -0.434117578, 3.548105859, -1029.0);
+Motor M1(1, MX_64, 311, OP_PWM, -2 * PI, 2 * PI, -1030.0);
+Motor M2(2, MX_106, 321, OP_PWM, -0.434117578, 3.548105859, -1029.0);
 Motor M3(3, MX_106, 321, OP_PWM, -0.398835938, 3.592591406, -942.0);
 Motor M4(4, MX_28, 30, OP_PWM, -2 * PI, 2 * PI, -978.0);
 Motor M5(5, MX_64, 311, OP_PWM, -1.951228125, 2.029461328, -2020.0);
@@ -283,11 +283,9 @@ void updateMotorState(Motor* M[6]) {
     }
   }*/
   // Read from motors using syncread
-  int duration = micros();
   xSemaphoreTake(motorComms, 1000);
   recv_cnt = dxl.syncRead(&sr_infos);
   xSemaphoreGive(motorComms);
-  Serial.println(micros() - duration);
 
   // Check if we received something from all motors
   if (recv_cnt > 0) {
@@ -295,6 +293,7 @@ void updateMotorState(Motor* M[6]) {
   } else {
     Serial.print("[fastSyncRead] Fail, Lib error code: ");
     Serial.println(dxl.getLastLibErrCode());
+    return;
   }
   // Timeout if a timeout was received from a motor.
   if (timeoutFlag) {
@@ -430,7 +429,7 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
   double C1, C2 = 0;
   int motorType = 0;
   double input_test = 0;
-  float nullSpace = 0.005;
+  float nullSpace = 0.0001;
   float currentLimit = 0;
   bool sucFlag = false;
 
@@ -491,8 +490,8 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
           input_test = tau(i) * motorConstants[motorType][1] + M[i]->state.qd * motorConstants[motorType][3];
         }
 */
-        //input_test = tau(i) * motorConstants[motorType][1] + M[i]->state.qd * motorConstants[motorType][3];
-
+        input_test = tau(i) * motorConstants[motorType][1] + M[i]->state.qd * motorConstants[motorType][3];
+        /*
         if (tau(i) < 0) {
           if (M[i]->state.qd < 0) {
             input_test = tau(i) * motorConstants[motorType][2] + M[i]->state.qd * motorConstants[motorType][3];
@@ -510,6 +509,7 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
             input_test = tau(i) * motorConstants[motorType][2] + M[i]->state.qd * motorConstants[motorType][3];
           }
         }
+        */
 
         // Limit the PWM value
         if (input_test > 885) {
@@ -529,15 +529,16 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
 
         // Insert data into buffer
         sw_data[i].goal_input = M[i]->input;
-        sw_infos.is_info_changed = true;
       }
     }
   }
+  sw_infos.is_info_changed = true;
   xSemaphoreTake(motorComms, 1000);
   sucFlag = dxl.syncWrite(&sw_infos);
   xSemaphoreGive(motorComms);
 
   if (sucFlag == true) {
+    /*
     Serial.println("[SyncWrite] Success");
     for (int i = 0; i < sw_infos.xel_count; i++) {
       Serial.print("  ID: ");
@@ -545,6 +546,7 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
       Serial.print("\t Goal Position: ");
       DEBUG_SERIAL.println(sw_data[i].goal_input);
     }
+    */
   }
 }
 
@@ -649,8 +651,11 @@ void ControlTask(void* pvParameters) {
   TickType_t lastWakeTime = xTaskGetTickCount();
 
   // Controller Parameters
-  double w_n[6] = { 5, 5, 5, 5, 5, 5 };    // natural frequency of system
-  double z_n[6] = { 1, 1, 1, 1, 1, 1 };  // damping ratio of system
+  //double w_n[6] = { 5, 8, 10, 20, 10, 20 };  // natural frequency of system
+  //double z_n[6] = { 1, 0.1, 0.1, 1, 0.1, 1 };  // damping ratio of system
+
+  double w_n[6] = { 5, 8, 10, 20, 10, 20 };  // natural frequency of system
+  double z_n[6] = { 1, 0.1, 0.1, 1, 0.1, 1 };  // damping ratio of system
 
   // General Variables
   double timeCapture = 0;
@@ -704,7 +709,7 @@ void ControlTask(void* pvParameters) {
     timeoutFlag = 0;
     // Read position and velocity of the motor
     updateMotorState(M);
-    Serial.println(micros() - duration);
+    //Serial.println(micros() - duration);
     if (inMotionFlag && !timeoutFlag) {
 
       // Insert motor state in vector
@@ -756,7 +761,7 @@ void ControlTask(void* pvParameters) {
           inMotionFlag = 0;
         }
       }
-      Serial.println(micros() - duration);
+      //Serial.println(micros() - duration);
 
       //Serial << "q_d: " << q_d << '\n';
       //Serial << "qd_d: " << qd_d << '\n';
@@ -765,7 +770,7 @@ void ControlTask(void* pvParameters) {
       q_e = q_d - q;
       qd_e = qd_d - qd;
 
-      //Serial << "q_e: " << q_e << '\n';
+      Serial << "q_e: " << q_e << '\n';
       //Serial << "qd_e: " << qd_e << '\n';
 
       // Caluclate input to B(q)y block
@@ -787,27 +792,29 @@ void ControlTask(void* pvParameters) {
 
       // Calculate required torque of motors
       tau = Bqdd + Cqd + g;
+      /*
       for (int i = 0; i < 6; i++) {
         if (q_e(i) < 0.05 && q_e(i) > -0.05) {
           tau(i) = 0;
         }
       }
-      
-      Serial << "tau: " << tau << '\n';
-      Serial.println(micros() - duration);
+      */
+
+      //Serial << "tau: " << tau << '\n';
+      //Serial.println(micros() - duration);
       // Update the motor input depending on the operating mode
       updateMotorInput(tau, g);
-      Serial.println(micros() - duration);
 
     } else if (timeoutFlag) {
       Serial.println("TIMEOUT DETECTED");
     }
 
-    
+    Serial.println(micros() - duration);
 
-    Serial.println();
 
-    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(50));
+    //Serial.println();
+
+    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(15));
   }
 }
 
