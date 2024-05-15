@@ -462,7 +462,7 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
   double C1, C2 = 0;
   int motorType = 0;
   double input_test = 0;
-  float nullSpace = 0.05;
+  float nullSpace = 0.001;
   float currentLimit = 0;
   bool sucFlag = false;
 
@@ -523,8 +523,8 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
           input_test = tau(i) * motorConstants[motorType][1] + M[i]->state.qd * motorConstants[motorType][3];
         }
 */
-        input_test = tau(i) * motorConstants[motorType][1] + M[i]->state.qd * motorConstants[motorType][3];
-        /*
+        //input_test = tau(i) * motorConstants[motorType][1] + M[i]->state.qd * motorConstants[motorType][3];
+        
         if (tau(i) < 0) {
           if (M[i]->state.qd < 0) {
             input_test = tau(i) * motorConstants[motorType][2] + M[i]->state.qd * motorConstants[motorType][3];
@@ -542,7 +542,7 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
             input_test = tau(i) * motorConstants[motorType][2] + M[i]->state.qd * motorConstants[motorType][3];
           }
         }
-        */
+        
 
         // Limit the PWM value
         if (input_test > 885) {
@@ -710,8 +710,22 @@ void ControlTask(void* pvParameters) {
   //double w_n[6] = { 5, 8, 10, 20, 10, 20 };  // natural frequency of system
   //double z_n[6] = { 1, 0.1, 0.1, 1, 0.1, 1 };  // damping ratio of system
 
-  double w_n[6] = { 1, 5, 5, 5, 5, 5 };              // natural frequency of system
-  double z_n[6] = { 1, 0.1, 0.1, 1, 0.1, 1 };  // damping ratio of system
+  //double w_n[6] = { 1.85, 8, 9, 1, 5, 1 };          // natural frequency of system
+  //double z_n[6] = { 0.08, 0.05, 1, 0.05, 0.05, 0.5 };  // damping ratio of system
+
+  //double w_n[6] = { 2, 8, 9, 1, 5, 5 };          // natural frequency of system
+  //double z_n[6] = { 0.2, 0.05, 1, 1, 0.05, 1 };  // damping ratio of system
+
+  //double w_n[6] = { 1.85, 8, 9, 1, 5, 1 };          // natural frequency of system
+  //double z_n[6] = { 0.08, 0.05, 1, 0.05, 0.05, 1 };  // damping ratio of system
+
+  // Denne er fin
+  //double w_n[6] = { 1.85, 8, 9, 1, 5, 1 };          // natural frequency of system
+  //double z_n[6] = { 0.08, 0.05, 1, 0.05, 0.05, 1 };  // damping ratio of system
+
+  // Denne er fin
+  double w_n[6] = { 1.85, 8, 9, 1, 5, 1 };          // natural frequency of system
+  double z_n[6] = { 0.07, 0.05, 1, 0.01, 0.05, 0.01 };  // damping ratio of system
 
   // General Variables
   double timeCapture = 0;
@@ -809,7 +823,7 @@ void ControlTask(void* pvParameters) {
             qdd_d(j) = getDesiredJointAcceleration(inputTime, Tr[j]->CubicCoefs[i - 1]);
           }
           break;  // To prevent the loop executing the next cubic before time
-        } else if (millis() > (Tr1.timeOffsets[Tr1.numberOfViaPoints] + 10000)) {
+        } else if (millis() > (Tr1.timeOffsets[Tr1.numberOfViaPoints] + 30000)) {
           Serial.println(millis());
           Serial.println(millis());
           Serial.println(Tr1.timeOffsets[Tr1.numberOfViaPoints]);
@@ -851,10 +865,13 @@ void ControlTask(void* pvParameters) {
       /*
       for (int i = 0; i < 6; i++) {
         if (q_e(i) < 0.05 && q_e(i) > -0.05) {
-          tau(i) = 0;
+          tau(i) = Cqd(i) + g(i);
         }
-      }
-      */
+        else {
+          tau(i) = Bqdd(i) + Cqd(i) + g(i);
+        }
+      }*/
+      
 
       Serial << "tau: " << tau << '\n';
       //Serial.println(micros() - duration);
