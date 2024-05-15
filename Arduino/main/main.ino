@@ -80,11 +80,11 @@ float MX_64_motorConstant = 1.156;
 */
 
 // Initialize motors (ID;TYPE;MODEL;OPERATINGMODE;OFFSET)
-Motor M1(1, MX_64, 311, OP_PWM, -2 * PI, 2 * PI, -1030.0);
-Motor M2(2, MX_106, 321, OP_PWM, -0.434117578, 3.548105859, -1029.0);
-Motor M3(3, MX_106, 321, OP_PWM, -0.398835938, 3.592591406, -942.0);
+Motor M1(1, MX_64, 311, OP_CURRENT, -2 * PI, 2 * PI, -1030.0);
+Motor M2(2, MX_106, 321, OP_CURRENT, -0.434117578, 3.548105859, -1029.0);
+Motor M3(3, MX_106, 321, OP_CURRENT, -0.398835938, 3.592591406, -942.0);
 Motor M4(4, MX_28, 30, OP_PWM, -2 * PI, 2 * PI, -978.0);
-Motor M5(5, MX_64, 311, OP_PWM, -1.951228125, 2.029461328, -2020.0);
+Motor M5(5, MX_64, 311, OP_CURRENT, -1.951228125, 2.029461328, -2020.0);
 Motor M6(6, MX_28, 30, OP_PWM, -2 * PI, 2 * PI, -3458.0);
 
 Motor* M[6] = { &M1, &M2, &M3, &M4, &M5, &M6 };
@@ -116,17 +116,26 @@ typedef struct sr_data {
   int32_t present_velocity;
   int32_t present_position;
 } __attribute__((packed)) sr_data_t;
-typedef struct sw_data {
-  int32_t goal_input;
-} __attribute__((packed)) sw_data_t;
+
+typedef struct sw_pwm {
+  int32_t goal_pwm;
+} __attribute__((packed)) sw_pwm_t;
+
+typedef struct sw_current {
+  int32_t goal_current;
+} __attribute__((packed)) sw_current_t;
 
 sr_data_t sr_data[DXL_ID_CNT];
 DYNAMIXEL::InfoSyncReadInst_t sr_infos;
 DYNAMIXEL::XELInfoSyncRead_t info_xels_sr[DXL_ID_CNT];
 
-sw_data_t sw_data[DXL_ID_CNT];
-DYNAMIXEL::InfoSyncWriteInst_t sw_infos;
-DYNAMIXEL::XELInfoSyncWrite_t info_xels_sw[DXL_ID_CNT];
+sw_pwm_t sw_pwm[2];
+DYNAMIXEL::InfoSyncWriteInst_t sw_infos_pwm;
+DYNAMIXEL::XELInfoSyncWrite_t info_xels_s_pwm[2];
+
+sw_current_t sw_current[4];
+DYNAMIXEL::InfoSyncWriteInst_t sw_infos_current;
+DYNAMIXEL::XELInfoSyncWrite_t info_xels_s_current[4];
 
 void setup() {
   Serial.begin(2000000);
@@ -156,12 +165,20 @@ void setup() {
 
   // Bulk write setup
   // Fill the members of structure to syncWrite using internal packet buffer
-  sw_infos.packet.p_buf = nullptr;
-  sw_infos.packet.is_completed = false;
-  sw_infos.addr = SW_START_ADDR;
-  sw_infos.addr_length = SW_ADDR_LEN;
-  sw_infos.p_xels = info_xels_sw;
-  sw_infos.xel_count = 0;
+  sw_infos_pwm.packet.p_buf = nullptr;
+  sw_infos_pwm.packet.is_completed = false;
+  sw_infos_pwm.addr = 100;
+  sw_infos_pwm.addr_length = 2;
+  sw_infos_pwm.p_xels = info_xels_s_pwm;
+  sw_infos_pwm.xel_count = 0;
+
+  //2
+  sw_infos_current.packet.p_buf = nullptr;
+  sw_infos_current.packet.is_completed = false;
+  sw_infos_current.addr = 102;
+  sw_infos_current.addr_length = 2;
+  sw_infos_current.p_xels = info_xels_s_current;
+  sw_infos_current.xel_count = 0;
 
   // Motor Setup
   for (int i = 0; i < DXL_ID_CNT; i++) {
@@ -175,13 +192,13 @@ void setup() {
     //Serial.println(micros() - x);
 
     dxl.torqueOff(M[i]->ID);
-    dxl.writeControlTableItem((uint8_t)RETURN_DELAY_TIME, (uint8_t)M[i]->ID, (int32_t)80, motorTimeout);
+    dxl.writeControlTableItem((uint8_t)RETURN_DELAY_TIME, (uint8_t)M[i]->ID, (int32_t)250, motorTimeout);
     //dxl.setBaudrate(M[i]->ID, 4500000);
     dxl.setOperatingMode(M[i]->ID, M[i]->mode);
 
     //Serial.println(dxl.readControlTableItem(BAUD_RATE, M[i]->ID));
     if (M[i]->mode == OP_CURRENT) {
-      dxl.writeControlTableItem((uint8_t)GOAL_PWM, (uint8_t)M[i]->ID, (int32_t)200, motorTimeout);
+      dxl.writeControlTableItem((uint8_t)GOAL_PWM, (uint8_t)M[i]->ID, (int32_t)800, motorTimeout);
     }
     if (M[i]->mode == OP_PWM) {
       dxl.writeControlTableItem((uint8_t)GOAL_CURRENT, (uint8_t)M[i]->ID, (int32_t)2047, motorTimeout);
@@ -196,19 +213,35 @@ void setup() {
 
     dxl.torqueOn(M[i]->ID);
 
-    // Bulk read setup
+    // Sync read setup
     info_xels_sr[i].id = M[i]->ID;
     info_xels_sr[i].p_recv_buf = (uint8_t*)&sr_data[i];
     sr_infos.xel_count++;
-
-    // Bulk write setup
-    sw_data[i].goal_input = 0;
-    info_xels_sw[i].id = M[i]->ID;
-    info_xels_sw[i].p_data = (uint8_t*)&sw_data[i].goal_input;
-    sw_infos.xel_count++;
   }
+  for (int i = 0; i < 2; i++) {
+    // Sync write setup
+    sw_pwm[i].goal_pwm = 0;
+    info_xels_s_pwm[i].id = M[i]->ID;
+    info_xels_s_pwm[i].p_data = (uint8_t*)&sw_pwm[i].goal_pwm;
+    sw_infos_pwm.xel_count++;
+  }
+  info_xels_s_pwm[0].id = 4;
+  info_xels_s_pwm[1].id = 6;
+
+  for (int i = 0; i < 4; i++) {
+    sw_current[i].goal_current = 0;
+    info_xels_s_current[i].p_data = (uint8_t*)&sw_current[i].goal_current;
+    sw_infos_current.xel_count++;
+  }
+
+  info_xels_s_current[0].id = 1;
+  info_xels_s_current[1].id = 2;
+  info_xels_s_current[2].id = 3;
+  info_xels_s_current[3].id = 5;
+
   sr_infos.is_info_changed = true;
-  sw_infos.is_info_changed = true;
+  sw_infos_pwm.is_info_changed = true;
+  sw_infos_current.is_info_changed = true;
 
   // Semaphore Creation
   motorComms = xSemaphoreCreateMutex();
@@ -429,7 +462,7 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
   double C1, C2 = 0;
   int motorType = 0;
   double input_test = 0;
-  float nullSpace = 0.0001;
+  float nullSpace = 0.05;
   float currentLimit = 0;
   bool sucFlag = false;
 
@@ -468,8 +501,8 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
         }
 
         M[i]->input = input_test;
-        Serial.print("Motor input: ");
-        Serial.println(M[i]->input);
+        //Serial.print("Motor input: ");
+        //Serial.println(M[i]->input);
 
         // Write new current value to the motor
         xSemaphoreTake(motorComms, 1000);
@@ -526,25 +559,48 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
         xSemaphoreTake(motorComms, 1000);
         //dxl.writeControlTableItem((uint8_t)GOAL_PWM, (uint8_t)M[i]->ID, (int32_t)M[i]->input, motorTimeout);
         xSemaphoreGive(motorComms);
-
-        // Insert data into buffer
-        sw_data[i].goal_input = M[i]->input;
       }
     }
+    //Serial.println(M[i]->input);
   }
-  sw_infos.is_info_changed = true;
-  xSemaphoreTake(motorComms, 1000);
-  sucFlag = dxl.syncWrite(&sw_infos);
-  xSemaphoreGive(motorComms);
+  // Insert data into buffer
+  sw_pwm[0].goal_pwm = M[3]->input;
+  sw_pwm[1].goal_pwm = M[5]->input;
+  sw_current[0].goal_current = M[0]->input;
+  sw_current[1].goal_current = M[1]->input;
+  sw_current[2].goal_current = M[2]->input;
+  sw_current[3].goal_current = M[4]->input;
 
+  sw_infos_pwm.is_info_changed = true;
+  sw_infos_current.is_info_changed = true;
+
+
+
+  xSemaphoreTake(motorComms, 1000);
+  sucFlag = dxl.syncWrite(&sw_infos_pwm);
+  xSemaphoreGive(motorComms);
   if (sucFlag == true) {
-    /*
+/*
     Serial.println("[SyncWrite] Success");
-    for (int i = 0; i < sw_infos.xel_count; i++) {
+    for (int i = 0; i < sw_infos_pwm.xel_count; i++) {
       Serial.print("  ID: ");
-      DEBUG_SERIAL.print(sw_infos.p_xels[i].id);
+      DEBUG_SERIAL.print(sw_infos_pwm.p_xels[i].id);
       Serial.print("\t Goal Position: ");
-      DEBUG_SERIAL.println(sw_data[i].goal_input);
+      DEBUG_SERIAL.println(sw_pwm[i].goal_pwm);
+    }
+    */
+  }
+  xSemaphoreTake(motorComms, 1000);
+  sucFlag = dxl.syncWrite(&sw_infos_current);
+  xSemaphoreGive(motorComms);
+  if (sucFlag == true) {
+/*
+    Serial.println("[SyncWrite] Success");
+    for (int i = 0; i < sw_infos_current.xel_count; i++) {
+      Serial.print("  ID: ");
+      DEBUG_SERIAL.print(sw_infos_current.p_xels[i].id);
+      Serial.print("\t Goal Position: ");
+      DEBUG_SERIAL.println(sw_current[i].goal_current);
     }
     */
   }
@@ -654,7 +710,7 @@ void ControlTask(void* pvParameters) {
   //double w_n[6] = { 5, 8, 10, 20, 10, 20 };  // natural frequency of system
   //double z_n[6] = { 1, 0.1, 0.1, 1, 0.1, 1 };  // damping ratio of system
 
-  double w_n[6] = { 5, 8, 10, 20, 10, 20 };  // natural frequency of system
+  double w_n[6] = { 1, 5, 5, 5, 5, 5 };              // natural frequency of system
   double z_n[6] = { 1, 0.1, 0.1, 1, 0.1, 1 };  // damping ratio of system
 
   // General Variables
@@ -800,7 +856,7 @@ void ControlTask(void* pvParameters) {
       }
       */
 
-      //Serial << "tau: " << tau << '\n';
+      Serial << "tau: " << tau << '\n';
       //Serial.println(micros() - duration);
       // Update the motor input depending on the operating mode
       updateMotorInput(tau, g);
@@ -814,7 +870,7 @@ void ControlTask(void* pvParameters) {
 
     //Serial.println();
 
-    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(15));
+    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(20));
   }
 }
 
