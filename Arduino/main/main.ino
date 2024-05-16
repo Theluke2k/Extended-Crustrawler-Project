@@ -90,12 +90,12 @@ Motor M6(6, MX_28, 30, OP_PWM, -2 * PI, 2 * PI, -3458.0);
 Motor* M[6] = { &M1, &M2, &M3, &M4, &M5, &M6 };
 
 // Initialize Trajectory planner with number of via points
-Trajectory Tr1(10);
-Trajectory Tr2(10);
-Trajectory Tr3(10);
-Trajectory Tr4(10);
-Trajectory Tr5(10);
-Trajectory Tr6(10);
+Trajectory Tr1(2);
+Trajectory Tr2(2);
+Trajectory Tr3(2);
+Trajectory Tr4(2);
+Trajectory Tr5(2);
+Trajectory Tr6(2);
 
 Trajectory* Tr[6] = { &Tr1, &Tr2, &Tr3, &Tr4, &Tr5, &Tr6 };
 
@@ -474,18 +474,28 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
         if (M[i]->type == MX_106) {
           currentLimit = 2047;
           if (tau(i) > nullSpace) {
-            input_test = tau(i) * 210.02 + 4.0649;
+            //input_test = tau(i) * 210.02 + 4.0649;
+            input_test = tau(i) * 133.33 + 7.84;
+            //input_test = tau(i) * 133.33 - 7.84;
+            //input_test = tau(i) * 133.33;
           } else if (tau(i) < -nullSpace) {
-            input_test = tau(i) * 210.02 - 4.0649;
+            //input_test = tau(i) * 210.02 - 4.0649;
+            input_test = tau(i) * 133.33 - 7.84;
+            //input_test = tau(i) * 133.33 + 7.84;
+            //input_test = tau(i) * 133.33;
           } else {
             input_test = 0;
           }
         } else if (M[i]->type == MX_64) {
           currentLimit = 1941;
           if (tau(i) > nullSpace) {
-            input_test = tau(i) * 257.37 + 26.777;
+            //input_test = tau(i) * 257.37 + 26.777;
+            input_test = tau(i) * 172.41 - 18.86;
+            //input_test = tau(i) * 172.41;
           } else if (tau(i) < -nullSpace) {
-            input_test = tau(i) * 257.37 - 26.777;
+            //input_test = tau(i) * 257.37 - 26.777;
+            input_test = tau(i) * 172.41 + 18.86;
+            //input_test = tau(i) * 172.41;
           } else {
             input_test = 0;
           }
@@ -514,7 +524,7 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
           else if: assisted by gravity.
           else: not affected by gravity.
         */
-        /*
+
         if (((tau(i) < 0) && (g(i) < 0)) || ((tau(i) > 0) && (g(i) > 0))) {
           input_test = tau(i) * motorConstants[motorType][2] + M[i]->state.qd * motorConstants[motorType][3];
         } else if (((tau(i) < 0) && (g(i) > 0)) || ((tau(i) > 0) && (g(i) < 0))) {
@@ -522,9 +532,9 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
         } else {
           input_test = tau(i) * motorConstants[motorType][1] + M[i]->state.qd * motorConstants[motorType][3];
         }
-*/
+
         //input_test = tau(i) * motorConstants[motorType][1] + M[i]->state.qd * motorConstants[motorType][3];
-        
+        /*
         if (tau(i) < 0) {
           if (M[i]->state.qd < 0) {
             input_test = tau(i) * motorConstants[motorType][2] + M[i]->state.qd * motorConstants[motorType][3];
@@ -542,7 +552,7 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
             input_test = tau(i) * motorConstants[motorType][2] + M[i]->state.qd * motorConstants[motorType][3];
           }
         }
-        
+*/
 
         // Limit the PWM value
         if (input_test > 885) {
@@ -580,7 +590,7 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
   sucFlag = dxl.syncWrite(&sw_infos_pwm);
   xSemaphoreGive(motorComms);
   if (sucFlag == true) {
-/*
+    /*
     Serial.println("[SyncWrite] Success");
     for (int i = 0; i < sw_infos_pwm.xel_count; i++) {
       Serial.print("  ID: ");
@@ -594,7 +604,7 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
   sucFlag = dxl.syncWrite(&sw_infos_current);
   xSemaphoreGive(motorComms);
   if (sucFlag == true) {
-/*
+    /*
     Serial.println("[SyncWrite] Success");
     for (int i = 0; i < sw_infos_current.xel_count; i++) {
       Serial.print("  ID: ");
@@ -724,13 +734,29 @@ void ControlTask(void* pvParameters) {
   //double z_n[6] = { 0.08, 0.05, 1, 0.05, 0.05, 1 };  // damping ratio of system
 
   // Denne er fin
-  double w_n[6] = { 1.85, 8, 9, 1, 5, 1 };          // natural frequency of system
-  double z_n[6] = { 0.07, 0.05, 1, 0.01, 0.05, 0.01 };  // damping ratio of system
+  //double w_n[6] = { 1.85, 8, 9, 1, 5, 1 };              // natural frequency of system
+  //double z_n[6] = { 0.07, 0.05, 1, 0.01, 0.05, 0.01 };  // damping ratio of system
+
+  // God!
+  //double w_n[6] = { 6, 10, 9, 20, 10, 20 };          // natural frequency of system
+  //double z_n[6] = { 0.07, 0.05, 0.05, 1, 0.05, 1 };  // damping ratio of system
+
+  // Fin nok
+  //double w_n[6] = { 9, 12, 16, 20, 20, 30 };              // natural frequency of system
+  //double z_n[6] = { 0.07, 0.05, 0.05, 1, 0.05, 1 };  // damping ratio of system
+
+  //double w_n[6] = { 22, 22, 22, 20, 22, 40 };              // natural frequency of system
+  //double z_n[6] = { 0.01, 0.01, 0.01, 1, 0.01, 1 };  // damping ratio of system
+
+  double w_n[6] = { 6, 10, 9, 20, 14, 30 };          // natural frequency of system
+  double z_n[6] = { 0.07, 0.05, 0.05, 1, 0.05, 1 };  // damping ratio of system
+
 
   // General Variables
   double timeCapture = 0;
   double inputTime = 0;
   double duration = 0;
+  char buffer[1000];
 
   // Define some structs used for computational optimization
   Pos q_op;
@@ -840,7 +866,7 @@ void ControlTask(void* pvParameters) {
       q_e = q_d - q;
       qd_e = qd_d - qd;
 
-      Serial << "q_e: " << q_e << '\n';
+      //Serial << "q_e: " << q_e << '\n';
       //Serial << "qd_e: " << qd_e << '\n';
 
       // Caluclate input to B(q)y block
@@ -871,9 +897,37 @@ void ControlTask(void* pvParameters) {
           tau(i) = Bqdd(i) + Cqd(i) + g(i);
         }
       }*/
-      
 
-      Serial << "tau: " << tau << '\n';
+      snprintf(buffer, sizeof(buffer), "%lu,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f",
+               millis(),
+               q_d(0),
+               q_d(1),
+               q_d(2),
+               q_d(3),
+               q_d(4),
+               q_d(5),
+               M1.state.q,
+               M2.state.q,
+               M3.state.q,
+               M4.state.q,
+               M5.state.q,
+               M6.state.q,
+               qd_d(0),
+               qd_d(1),
+               qd_d(2),
+               qd_d(3),
+               qd_d(4),
+               qd_d(5),
+               M1.state.qd,
+               M2.state.qd,
+               M3.state.qd,
+               M4.state.qd,
+               M5.state.qd,
+               M6.state.qd);
+
+      Serial.println(buffer);
+
+      //Serial << "tau: " << tau << '\n';
       //Serial.println(micros() - duration);
       // Update the motor input depending on the operating mode
       updateMotorInput(tau, g);
@@ -882,12 +936,12 @@ void ControlTask(void* pvParameters) {
       Serial.println("TIMEOUT DETECTED");
     }
 
-    Serial.println(micros() - duration);
+    //Serial.println(micros() - duration);
 
 
     //Serial.println();
 
-    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(20));
+    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(15));
   }
 }
 
@@ -908,34 +962,36 @@ void TrajectoryPlanner(void* pvParameters) {
   updateMotorState(M);
 
   // Array to hold the joint space path points converted from the user input using inverse kinematics
-  float times[100] = { 0, 5, 10 };
+  float times[100] = { 0, 10, 20 };
   float positions[100][6] = { 0 };
   float velocities[100][6] = { 0 };
-  /*
+
   // Initialize some inputs for tests
   // First point
-  positions[1][0] = PI / 4;
+  positions[1][0] = 0;
   positions[1][1] = PI / 4;
   positions[1][2] = PI / 4;
-  positions[1][3] = PI / 4;
-  positions[1][4] = PI / 4;
-  positions[1][5] = PI / 4;
+  positions[1][3] = 0;
+  positions[1][4] = -PI / 4;
+  positions[1][5] = 0;
 
   // Second point
-  positions[2][0] = PI / 2;
-  positions[2][1] = PI / 2;
-  positions[2][2] = PI / 2;
-  positions[2][3] = PI / 2;
-  positions[2][4] = PI / 2;
-  positions[2][5] = PI / 2;
-  */
+  positions[2][0] = -PI / 2;
+  positions[2][1] = (3 * PI) / 4;
+  positions[2][2] = (3 * PI) / 4;
+  positions[2][3] = PI;
+  positions[2][4] = (PI) / 4;
+  positions[2][5] = PI;
+
   // Initialize path points (this should be executed in runtime in reality)
 
 
   while (1) {
     // Trajectory should only be updated if the manipualtor is not already executing a trajectory
     if (!inMotionFlag) {
-      if (UserInputListener()) {  // format "time1 time2 , p11 p12 p13 o11 o12 o13 p21 p22 p23 o21 o22 o23"
+
+      if (1) {  // format "time1 time2 , p11 p12 p13 o11 o12 o13 p21 p22 p23 o21 o22 o23"
+        /*
         for (int i = 1; i <= Tr[1]->numberOfViaPoints; i++) {
           // Convert user input orientation to rotation matrix and to joint space
           R06 = convertEuler2Matrix(userPositions[i][3], userPositions[i][4], userPositions[i][5]);
@@ -1014,7 +1070,9 @@ void TrajectoryPlanner(void* pvParameters) {
         Serial.print("VALIDINPUT: ");
         Serial.println(validInput);
 
-        if (validInput == true) {
+        */
+
+        if (1) {
           // Update motor state
           updateMotorState(M);
 
@@ -1069,7 +1127,7 @@ void TrajectoryPlanner(void* pvParameters) {
               Serial.println(Tr[i]->timeOffsets[j]);
             }
           }
-          if (validInput == true) {
+          if (1) {
             inMotionFlag = 1;
           }
         }
