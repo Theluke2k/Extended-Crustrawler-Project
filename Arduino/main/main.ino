@@ -673,11 +673,11 @@ uint8_t UserInputListener() {
       }
     }
 
-    Serial.println("PRINT CHECK");
+    //Serial.println("PRINT CHECK");
     for (int i = 0; i < 6; i++) {
-      Serial.println(userTimes[i]);
+      //Serial.println(userTimes[i]);
       for (int j = 0; j < 6; j++) {
-        Serial.println(userPositions[i][j]);
+        //Serial.println(userPositions[i][j]);
       }
       Tr[i]->numberOfViaPoints = arrayIndex - 1;
     }
@@ -752,8 +752,13 @@ void ControlTask(void* pvParameters) {
   //double w_n[6] = { 6, 10, 9, 20, 14, 30 };          // natural frequency of system
   //double z_n[6] = { 0.07, 0.05, 0.05, 1, 0.05, 1 };  // damping ratio of system
 
-  double w_n[6] = { 6, 10, 10, 20, 14, 30 };          // natural frequency of system
-  double z_n[6] = { 0.07, 0.05, 0.05, 1, 0.05, 1 };  // damping ratio of system
+  // Brugt til test1 med current
+  //double w_n[6] = { 6, 10, 10, 20, 14, 30 };          // natural frequency of system
+  //double z_n[6] = { 0.07, 0.05, 0.05, 1, 0.05, 1 };  // damping ratio of system
+
+  // Brugt til test3 med current
+  double w_n[6] = { 10, 10, 11, 25, 14, 40 };          // natural frequency of system
+  double z_n[6] = { 0.1, 0.05, 0.05, 1, 0.05, 1 };  // damping ratio of system
 
 
   // General Variables
@@ -804,8 +809,12 @@ void ControlTask(void* pvParameters) {
   Kp.diagonal = { w_n[0] * w_n[0], w_n[1] * w_n[1], w_n[2] * w_n[2], w_n[3] * w_n[3], w_n[4] * w_n[4], w_n[5] * w_n[5] };
   Kd.diagonal = { 2 * z_n[0] * w_n[0], 2 * z_n[1] * w_n[1], 2 * z_n[2] * w_n[2], 2 * z_n[3] * w_n[3], 2 * z_n[4] * w_n[4], 2 * z_n[5] * w_n[5] };
 
+  int runtimes = 0;
+  int dur = 0;
+
   while (1) {
-    duration = micros();
+    //Serial.print(millis());
+    duration = millis();
     timeoutFlag = 0;
     // Read position and velocity of the motor
     updateMotorState(M);
@@ -853,11 +862,11 @@ void ControlTask(void* pvParameters) {
             qdd_d(j) = getDesiredJointAcceleration(inputTime, Tr[j]->CubicCoefs[i - 1]);
           }
           break;  // To prevent the loop executing the next cubic before time
-        } else if (millis() > (Tr1.timeOffsets[Tr1.numberOfViaPoints] + 30000)) {
-          Serial.println(millis());
-          Serial.println(millis());
-          Serial.println(Tr1.timeOffsets[Tr1.numberOfViaPoints]);
-          Serial.println(Tr1.timeOffsets[Tr1.numberOfViaPoints + 1]);
+        } else if (millis() > (Tr1.timeOffsets[Tr1.numberOfViaPoints] + 160000)) {
+          //Serial.println(millis());
+          //Serial.println(millis());
+          //Serial.println(Tr1.timeOffsets[Tr1.numberOfViaPoints]);
+          //Serial.println(Tr1.timeOffsets[Tr1.numberOfViaPoints + 1]);
           inMotionFlag = 0;
         }
       }
@@ -901,7 +910,7 @@ void ControlTask(void* pvParameters) {
           tau(i) = Bqdd(i) + Cqd(i) + g(i);
         }
       }*/
-
+/*
       snprintf(buffer, sizeof(buffer), "%lu,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f",
                millis(),
                q_d(0),
@@ -943,7 +952,7 @@ void ControlTask(void* pvParameters) {
                );
 
       Serial.println(buffer);
-
+*/
       //Serial << "tau: " << tau << '\n';
       //Serial.println(micros() - duration);
       // Update the motor input depending on the operating mode
@@ -953,8 +962,7 @@ void ControlTask(void* pvParameters) {
       Serial.println("TIMEOUT DETECTED");
     }
 
-    //Serial.println(micros() - duration);
-
+    
 
     //Serial.println();
 
@@ -969,6 +977,12 @@ void TrajectoryPlanner(void* pvParameters) {
   // Local variables
   double duration = 0;
   double timeOffset = 0;
+
+  // Tests
+  int runtimes = 0;
+  int dur = 0;
+  int durationTest = 0;
+  char buffer[1000];
 
 
   // Matrices
@@ -1004,8 +1018,10 @@ void TrajectoryPlanner(void* pvParameters) {
 
 
   while (1) {
+    Serial.print(millis());
+    durationTest = millis();
     // Trajectory should only be updated if the manipualtor is not already executing a trajectory
-    if (!inMotionFlag) {
+    if (1) {
 
       if (1) {  // format "time1 time2 , p11 p12 p13 o11 o12 o13 p21 p22 p23 o21 o22 o23"
         /*
@@ -1099,16 +1115,16 @@ void TrajectoryPlanner(void* pvParameters) {
             Tr[i]->times[0] = 0;
             Tr[i]->positions[0] = M[i]->state.q;  //
             Tr[i]->velocities[0] = 0;             //M[i]->state.qd.  Maybe better to set to zero? In case of a bad reading, the trajectory will be crazy...
-            Serial.println("SET PATH POINTS");
+            //Serial.println("SET PATH POINTS");
             // Set the rest of the path points
             for (int j = 1; j <= Tr[i]->numberOfViaPoints; j++) {
               Tr[i]->times[j] = times[j] * 1000.0;
-              Serial.println(Tr[i]->times[j]);
+              //Serial.println(Tr[i]->times[j]);
               Tr[i]->positions[j] = positions[j][i];
               Tr[i]->velocities[j] = velocities[j][i];
             }
           }
-
+/*
           Serial.println(times[0]);
           Serial.println(times[1]);
           Serial.println(times[2]);
@@ -1122,7 +1138,7 @@ void TrajectoryPlanner(void* pvParameters) {
           Serial.println(positions[3][1]);
           Serial.println(positions[4][1]);
           Serial.println(positions[5][1]);
-
+*/
           // Compute cubic polynomial between each via point
           for (int i = 0; i < 6; i++) {
             for (int j = 0; j < Tr[i]->numberOfViaPoints; j++) {
@@ -1136,12 +1152,12 @@ void TrajectoryPlanner(void* pvParameters) {
           // Capture time of motion start
           timeOffset = millis();
 
-          Serial.println("TIME OFFSETS");
+          //Serial.println("TIME OFFSETS");
           // Set time offset for Polynomials
           for (int i = 0; i < 6; i++) {
             for (int j = 0; j <= Tr[i]->numberOfViaPoints; j++) {
               Tr[i]->timeOffsets[j] = Tr[i]->times[j] + timeOffset;
-              Serial.println(Tr[i]->timeOffsets[j]);
+              //Serial.println(Tr[i]->timeOffsets[j]);
             }
           }
           if (1) {
@@ -1150,6 +1166,16 @@ void TrajectoryPlanner(void* pvParameters) {
         }
       }
     }
+
+    runtimes++;
+    dur = millis() - durationTest;
+  
+    snprintf(buffer, sizeof(buffer), ",%d,%d",
+               dur,
+               runtimes
+               );
+    Serial.println(buffer);
+
     vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(1000));
   }
 }
