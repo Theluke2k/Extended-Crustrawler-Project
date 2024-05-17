@@ -80,11 +80,11 @@ float MX_64_motorConstant = 1.156;
 */
 
 // Initialize motors (ID;TYPE;MODEL;OPERATINGMODE;OFFSET)
-Motor M1(1, MX_64, 311, OP_CURRENT, -2 * PI, 2 * PI, -1030.0);
-Motor M2(2, MX_106, 321, OP_CURRENT, -0.434117578, 3.548105859, -1029.0);
-Motor M3(3, MX_106, 321, OP_CURRENT, -0.398835938, 3.592591406, -942.0);
+Motor M1(1, MX_64, 311, OP_PWM, -2 * PI, 2 * PI, -1030.0);
+Motor M2(2, MX_106, 321, OP_PWM, -0.434117578, 3.548105859, -1029.0);
+Motor M3(3, MX_106, 321, OP_PWM, -0.398835938, 3.592591406, -942.0);
 Motor M4(4, MX_28, 30, OP_PWM, -2 * PI, 2 * PI, -978.0);
-Motor M5(5, MX_64, 311, OP_CURRENT, -1.951228125, 2.029461328, -2020.0);
+Motor M5(5, MX_64, 311, OP_PWM, -1.951228125, 2.029461328, -2020.0);
 Motor M6(6, MX_28, 30, OP_PWM, -2 * PI, 2 * PI, -3458.0);
 
 Motor* M[6] = { &M1, &M2, &M3, &M4, &M5, &M6 };
@@ -129,9 +129,9 @@ sr_data_t sr_data[DXL_ID_CNT];
 DYNAMIXEL::InfoSyncReadInst_t sr_infos;
 DYNAMIXEL::XELInfoSyncRead_t info_xels_sr[DXL_ID_CNT];
 
-sw_pwm_t sw_pwm[2];
+sw_pwm_t sw_pwm[6];
 DYNAMIXEL::InfoSyncWriteInst_t sw_infos_pwm;
-DYNAMIXEL::XELInfoSyncWrite_t info_xels_s_pwm[2];
+DYNAMIXEL::XELInfoSyncWrite_t info_xels_s_pwm[6];
 
 sw_current_t sw_current[4];
 DYNAMIXEL::InfoSyncWriteInst_t sw_infos_current;
@@ -218,30 +218,17 @@ void setup() {
     info_xels_sr[i].p_recv_buf = (uint8_t*)&sr_data[i];
     sr_infos.xel_count++;
   }
-  for (int i = 0; i < 2; i++) {
+  for (int i = 0; i < 6; i++) {
     // Sync write setup
     sw_pwm[i].goal_pwm = 0;
     info_xels_s_pwm[i].id = M[i]->ID;
     info_xels_s_pwm[i].p_data = (uint8_t*)&sw_pwm[i].goal_pwm;
     sw_infos_pwm.xel_count++;
+    info_xels_s_pwm[i].id = M[i]->ID;
   }
-  info_xels_s_pwm[0].id = 4;
-  info_xels_s_pwm[1].id = 6;
-
-  for (int i = 0; i < 4; i++) {
-    sw_current[i].goal_current = 0;
-    info_xels_s_current[i].p_data = (uint8_t*)&sw_current[i].goal_current;
-    sw_infos_current.xel_count++;
-  }
-
-  info_xels_s_current[0].id = 1;
-  info_xels_s_current[1].id = 2;
-  info_xels_s_current[2].id = 3;
-  info_xels_s_current[3].id = 5;
 
   sr_infos.is_info_changed = true;
   sw_infos_pwm.is_info_changed = true;
-  sw_infos_current.is_info_changed = true;
 
   // Semaphore Creation
   motorComms = xSemaphoreCreateMutex();
@@ -416,48 +403,6 @@ __attribute__((always_inline)) void get_Bqdd(float Arr[6], Pos* p, Acc* a, Optim
   Arr[5] = get_Bqdd6(p, a, o);
 }
 
-void getPWM(BLA::Matrix<6> tau) {
-  double C1, C2 = 0;
-  int motorType = 0;
-  double pwm_test = 0;
-
-
-  for (int i = 0; i < 6; i++) {
-    // Get motor type
-    motorType = M[i]->type;
-    C2 = motorConstants[motorType][3];
-
-    // Find constants
-    if (tau(i) < 0) {
-      if (M[i]->state.qd < 0) {
-        C1 = motorConstants[motorType][2];
-      } else if (M[i]->state.qd == 0) {
-        C1 = motorConstants[motorType][1];
-      } else {
-        C1 = motorConstants[motorType][0];
-      }
-    } else {
-      if (M[i]->state.qd < 0) {
-        C1 = motorConstants[motorType][0];
-      } else if (M[i]->state.qd == 0) {
-        C1 = motorConstants[motorType][1];
-      } else {
-        C1 = motorConstants[motorType][2];
-      }
-    }
-
-    pwm_test = C1 * tau(i) + M[i]->state.qd * C2;
-    if (pwm_test > 885) {
-      pwm_test = 885;
-    }
-    if (pwm_test < -855) {
-      pwm_test = -885;
-    }
-
-    M[i]->input = pwm_test;
-  }
-}
-
 void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
   double C1, C2 = 0;
   int motorType = 0;
@@ -513,11 +458,6 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
         M[i]->input = input_test;
         //Serial.print("Motor input: ");
         //Serial.println(M[i]->input);
-
-        // Write new current value to the motor
-        xSemaphoreTake(motorComms, 1000);
-        //dxl.writeControlTableItem((uint8_t)GOAL_CURRENT, (uint8_t)M[i]->ID, (int32_t)M[i]->input, motorTimeout);
-        xSemaphoreGive(motorComms);
       } else if (M[i]->mode == OP_PWM) {
         /*
           if: opposed by gravity.
@@ -565,24 +505,19 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
         M[i]->input = input_test;
         //Serial.print("PWM: ");
         //Serial.println(M[i]->input);
-        // Write the new PWM value to the motor
-        xSemaphoreTake(motorComms, 1000);
-        //dxl.writeControlTableItem((uint8_t)GOAL_PWM, (uint8_t)M[i]->ID, (int32_t)M[i]->input, motorTimeout);
-        xSemaphoreGive(motorComms);
       }
     }
     //Serial.println(M[i]->input);
   }
   // Insert data into buffer
-  sw_pwm[0].goal_pwm = M[3]->input;
-  sw_pwm[1].goal_pwm = M[5]->input;
-  sw_current[0].goal_current = M[0]->input;
-  sw_current[1].goal_current = M[1]->input;
-  sw_current[2].goal_current = M[2]->input;
-  sw_current[3].goal_current = M[4]->input;
+  sw_pwm[0].goal_pwm = M[0]->input;
+  sw_pwm[1].goal_pwm = M[1]->input;
+  sw_pwm[2].goal_pwm = M[2]->input;
+  sw_pwm[3].goal_pwm = M[3]->input;
+  sw_pwm[4].goal_pwm = M[4]->input;
+  sw_pwm[5].goal_pwm = M[5]->input;
 
   sw_infos_pwm.is_info_changed = true;
-  sw_infos_current.is_info_changed = true;
 
 
 
@@ -597,20 +532,6 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
       DEBUG_SERIAL.print(sw_infos_pwm.p_xels[i].id);
       Serial.print("\t Goal Position: ");
       DEBUG_SERIAL.println(sw_pwm[i].goal_pwm);
-    }
-    */
-  }
-  xSemaphoreTake(motorComms, 1000);
-  sucFlag = dxl.syncWrite(&sw_infos_current);
-  xSemaphoreGive(motorComms);
-  if (sucFlag == true) {
-    /*
-    Serial.println("[SyncWrite] Success");
-    for (int i = 0; i < sw_infos_current.xel_count; i++) {
-      Serial.print("  ID: ");
-      DEBUG_SERIAL.print(sw_infos_current.p_xels[i].id);
-      Serial.print("\t Goal Position: ");
-      DEBUG_SERIAL.println(sw_current[i].goal_current);
     }
     */
   }
@@ -748,8 +669,13 @@ void ControlTask(void* pvParameters) {
   //double w_n[6] = { 22, 22, 22, 20, 22, 40 };              // natural frequency of system
   //double z_n[6] = { 0.01, 0.01, 0.01, 1, 0.01, 1 };  // damping ratio of system
 
-  double w_n[6] = { 6, 10, 9, 20, 14, 30 };          // natural frequency of system
-  double z_n[6] = { 0.07, 0.05, 0.05, 1, 0.05, 1 };  // damping ratio of system
+  // Brugt til test simple movement test
+  //double w_n[6] = { 6, 10, 9, 20, 14, 30 };          // natural frequency of system
+  //double z_n[6] = { 0.07, 0.05, 0.05, 1, 0.05, 1 };  // damping ratio of system
+
+  // Fin til PWM
+  double w_n[6] = { 15, 9, 20, 20, 30, 40 };          // natural frequency of system
+  double z_n[6] = { 0.2, 0.3, 0.3, 1, 0.3, 1 };  // damping ratio of system
 
 
   // General Variables
@@ -897,7 +823,7 @@ void ControlTask(void* pvParameters) {
           tau(i) = Bqdd(i) + Cqd(i) + g(i);
         }
       }*/
-
+/*
       snprintf(buffer, sizeof(buffer), "%lu,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f",
                millis(),
                q_d(0),
@@ -924,7 +850,27 @@ void ControlTask(void* pvParameters) {
                M4.state.qd,
                M5.state.qd,
                M6.state.qd);
-
+      */
+      snprintf(buffer, sizeof(buffer), "%lu,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f",
+               millis(),
+               q_d(0),
+               q_d(1),
+               q_d(2),
+               q_d(3),
+               q_d(4),
+               q_d(5),
+               M1.state.q,
+               M2.state.q,
+               M3.state.q,
+               M4.state.q,
+               M5.state.q,
+               M6.state.q,
+              q_e(0),
+              q_e(1),
+              q_e(2),
+              q_e(3),
+              q_e(4),
+              q_e(5));
       Serial.println(buffer);
 
       //Serial << "tau: " << tau << '\n';
@@ -1082,16 +1028,16 @@ void TrajectoryPlanner(void* pvParameters) {
             Tr[i]->times[0] = 0;
             Tr[i]->positions[0] = M[i]->state.q;  //
             Tr[i]->velocities[0] = 0;             //M[i]->state.qd.  Maybe better to set to zero? In case of a bad reading, the trajectory will be crazy...
-            Serial.println("SET PATH POINTS");
+            //Serial.println("SET PATH POINTS");
             // Set the rest of the path points
             for (int j = 1; j <= Tr[i]->numberOfViaPoints; j++) {
               Tr[i]->times[j] = times[j] * 1000.0;
-              Serial.println(Tr[i]->times[j]);
+              //Serial.println(Tr[i]->times[j]);
               Tr[i]->positions[j] = positions[j][i];
               Tr[i]->velocities[j] = velocities[j][i];
             }
           }
-
+          /*
           Serial.println(times[0]);
           Serial.println(times[1]);
           Serial.println(times[2]);
@@ -1105,6 +1051,7 @@ void TrajectoryPlanner(void* pvParameters) {
           Serial.println(positions[3][1]);
           Serial.println(positions[4][1]);
           Serial.println(positions[5][1]);
+          */
 
           // Compute cubic polynomial between each via point
           for (int i = 0; i < 6; i++) {
@@ -1119,12 +1066,12 @@ void TrajectoryPlanner(void* pvParameters) {
           // Capture time of motion start
           timeOffset = millis();
 
-          Serial.println("TIME OFFSETS");
+          //Serial.println("TIME OFFSETS");
           // Set time offset for Polynomials
           for (int i = 0; i < 6; i++) {
             for (int j = 0; j <= Tr[i]->numberOfViaPoints; j++) {
               Tr[i]->timeOffsets[j] = Tr[i]->times[j] + timeOffset;
-              Serial.println(Tr[i]->timeOffsets[j]);
+              //Serial.println(Tr[i]->timeOffsets[j]);
             }
           }
           if (1) {
