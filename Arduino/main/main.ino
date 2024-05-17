@@ -83,7 +83,7 @@ float MX_64_motorConstant = 1.156;
 Motor M1(1, MX_64, 311, OP_CURRENT, -2 * PI, 2 * PI, -1030.0);
 Motor M2(2, MX_106, 321, OP_CURRENT, -0.434117578, 3.548105859, -1029.0);
 Motor M3(3, MX_106, 321, OP_CURRENT, -0.398835938, 3.592591406, -942.0);
-Motor M4(4, MX_28, 30, OP_PWM, -2 * PI, 2 * PI, -978.0);
+Motor M4(4, MX_28, 30, OP_PWM, -2 * PI, 2 * PI, -2018);
 Motor M5(5, MX_64, 311, OP_CURRENT, -1.951228125, 2.029461328, -2020.0);
 Motor M6(6, MX_28, 30, OP_PWM, -2 * PI, 2 * PI, -3458.0);
 
@@ -490,12 +490,12 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
           currentLimit = 1941;
           if (tau(i) > nullSpace) {
             //input_test = tau(i) * 257.37 + 26.777;
-            input_test = tau(i) * 172.41 - 18.86;
-            //input_test = tau(i) * 172.41;
+            //input_test = tau(i) * 172.41 - 18.86;
+            input_test = tau(i) * 172.41;
           } else if (tau(i) < -nullSpace) {
             //input_test = tau(i) * 257.37 - 26.777;
-            input_test = tau(i) * 172.41 + 18.86;
-            //input_test = tau(i) * 172.41;
+            //input_test = tau(i) * 172.41 + 18.86;
+            input_test = tau(i) * 172.41;
           } else {
             input_test = 0;
           }
@@ -748,7 +748,11 @@ void ControlTask(void* pvParameters) {
   //double w_n[6] = { 22, 22, 22, 20, 22, 40 };              // natural frequency of system
   //double z_n[6] = { 0.01, 0.01, 0.01, 1, 0.01, 1 };  // damping ratio of system
 
-  double w_n[6] = { 6, 10, 9, 20, 14, 30 };          // natural frequency of system
+  // Brugt til forrige test
+  //double w_n[6] = { 6, 10, 9, 20, 14, 30 };          // natural frequency of system
+  //double z_n[6] = { 0.07, 0.05, 0.05, 1, 0.05, 1 };  // damping ratio of system
+
+  double w_n[6] = { 6, 10, 10, 20, 14, 30 };          // natural frequency of system
   double z_n[6] = { 0.07, 0.05, 0.05, 1, 0.05, 1 };  // damping ratio of system
 
 
