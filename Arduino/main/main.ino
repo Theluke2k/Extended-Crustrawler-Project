@@ -736,6 +736,7 @@ void ControlTask(void* pvParameters) {
   Kd.diagonal = { 2 * z_n[0] * w_n[0], 2 * z_n[1] * w_n[1], 2 * z_n[2] * w_n[2], 2 * z_n[3] * w_n[3], 2 * z_n[4] * w_n[4], 2 * z_n[5] * w_n[5] };
 
   while (1) {
+    //Serial.println(millis());
     duration = micros();
     timeoutFlag = 0;
     // Read position and velocity of the motor
@@ -833,7 +834,7 @@ void ControlTask(void* pvParameters) {
         }
       }*/
 
-      snprintf(buffer, sizeof(buffer), "%lu,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f",
+      snprintf(buffer, sizeof(buffer), "%lu,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f",
                millis(),
                q_d(0),
                q_d(1),
@@ -858,7 +859,20 @@ void ControlTask(void* pvParameters) {
                M3.state.qd,
                M4.state.qd,
                M5.state.qd,
-               M6.state.qd);
+               M6.state.qd,
+               tau(0),
+               tau(1),
+               tau(2),
+               tau(3),
+               tau(4),
+               tau(5),
+               M1.input,
+               M2.input,
+               M3.input,
+               M4.input,
+               M5.input,
+               M6.input
+               );
       
       /*
       snprintf(buffer, sizeof(buffer), "%lu,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f",
