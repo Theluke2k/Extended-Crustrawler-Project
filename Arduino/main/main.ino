@@ -83,19 +83,19 @@ float MX_64_motorConstant = 1.156;
 Motor M1(1, MX_64, 311, OP_PWM, -2 * PI, 2 * PI, -1030.0);
 Motor M2(2, MX_106, 321, OP_PWM, -0.434117578, 3.548105859, -1029.0);
 Motor M3(3, MX_106, 321, OP_PWM, -0.398835938, 3.592591406, -942.0);
-Motor M4(4, MX_28, 30, OP_PWM, -2 * PI, 2 * PI, -978.0);
+Motor M4(4, MX_28, 30, OP_PWM, -2 * PI, 2 * PI, -2018);
 Motor M5(5, MX_64, 311, OP_PWM, -1.951228125, 2.029461328, -2020.0);
 Motor M6(6, MX_28, 30, OP_PWM, -2 * PI, 2 * PI, -3458.0);
 
 Motor* M[6] = { &M1, &M2, &M3, &M4, &M5, &M6 };
 
 // Initialize Trajectory planner with number of via points
-Trajectory Tr1(2);
-Trajectory Tr2(2);
-Trajectory Tr3(2);
-Trajectory Tr4(2);
-Trajectory Tr5(2);
-Trajectory Tr6(2);
+Trajectory Tr1(3);
+Trajectory Tr2(3);
+Trajectory Tr3(3);
+Trajectory Tr4(3);
+Trajectory Tr5(3);
+Trajectory Tr6(3);
 
 Trajectory* Tr[6] = { &Tr1, &Tr2, &Tr3, &Tr4, &Tr5, &Tr6 };
 
@@ -206,7 +206,7 @@ void setup() {
 
     // Print info
     Serial.print("Motor");
-    Serial.println(i);
+    Serial.println(M[i]->ID);
     Serial.println(dxl.readControlTableItem((uint8_t)OPERATING_MODE, (uint8_t)M[i]->ID, motorTimeout));
     Serial.println(dxl.readControlTableItem((uint8_t)RETURN_DELAY_TIME, (uint8_t)M[i]->ID, motorTimeout));
     Serial.println(dxl.readControlTableItem((uint8_t)PRESENT_POSITION, (uint8_t)M[i]->ID, motorTimeout));
@@ -288,20 +288,7 @@ void updateMotorState(Motor* M[6]) {
   uint8_t recv_cnt;
   float sensitivity;
   double x = 0;
-  /*
-  for (int i = 0; i < 6; i++) {
-    if (firstStartup) {
-      getMotorState(M[i], 10000);
-      if (timeoutFlag) {
-        return;
-      }
-    } else {
-      getMotorState(M[i], 10);
-      if (timeoutFlag) {
-        return;
-      }
-    }
-  }*/
+
   // Read from motors using syncread
   xSemaphoreTake(motorComms, 1000);
   recv_cnt = dxl.syncRead(&sr_infos);
@@ -674,8 +661,30 @@ void ControlTask(void* pvParameters) {
   //double z_n[6] = { 0.07, 0.05, 0.05, 1, 0.05, 1 };  // damping ratio of system
 
   // Fin til PWM
-  double w_n[6] = { 15, 9, 20, 20, 30, 40 };          // natural frequency of system
-  double z_n[6] = { 0.2, 0.3, 0.3, 1, 0.3, 1 };  // damping ratio of system
+  //double w_n[6] = { 15, 12, 20, 25, 23, 40 };          // natural frequency of system
+  //double z_n[6] = { 0.4, 0.3, 0.3, 1, 0.3, 1 };  // damping ratio of system
+
+
+  //double w_n[6] = { 18, 9, 15, 40, 20, 60 };          // natural frequency of system
+  //double z_n[6] = { 0.2, 0.2, 0.2, 1, 0.2, 1 };  // damping ratio of system
+
+  // Virkede godt men rystede lidt
+  //double w_n[6] = { 15, 12, 20, 25, 23, 40 };          // natural frequency of system
+  //double z_n[6] = { 0.2, 0.2, 0.3, 1, 0.3, 1 };  // damping ratio of system
+
+  // Virkede bedre men skal 2 skal måkse have mere dæmpning
+  //double w_n[6] = { 15, 12, 20, 25, 23, 40 };          // natural frequency of system
+  //double z_n[6] = { 0.2, 0.2, 0.3, 1, 0.3, 1 };  // damping ratio of system
+  
+  // Virkede god men 1 eteren skal have lidt dæmpning
+  //double w_n[6] = { 15, 12, 20, 25, 23, 40 };          // natural frequency of system
+  //double z_n[6] = { 0.2, 0.25, 0.3, 1, 0.3, 1 };  // damping ratio of system
+
+  // Brugt til simple movement test (PWM)
+  double w_n[6] = { 15, 12, 20, 25, 23, 40 };          // natural frequency of system
+  double z_n[6] = { 0.4, 0.25, 0.3, 1, 0.3, 1 };  // damping ratio of system
+
+  
 
 
   // General Variables
@@ -823,7 +832,7 @@ void ControlTask(void* pvParameters) {
           tau(i) = Bqdd(i) + Cqd(i) + g(i);
         }
       }*/
-/*
+
       snprintf(buffer, sizeof(buffer), "%lu,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f",
                millis(),
                q_d(0),
@@ -850,7 +859,8 @@ void ControlTask(void* pvParameters) {
                M4.state.qd,
                M5.state.qd,
                M6.state.qd);
-      */
+      
+      /*
       snprintf(buffer, sizeof(buffer), "%lu,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f",
                millis(),
                q_d(0),
@@ -871,6 +881,7 @@ void ControlTask(void* pvParameters) {
               q_e(3),
               q_e(4),
               q_e(5));
+              */
       Serial.println(buffer);
 
       //Serial << "tau: " << tau << '\n';
@@ -908,7 +919,7 @@ void TrajectoryPlanner(void* pvParameters) {
   updateMotorState(M);
 
   // Array to hold the joint space path points converted from the user input using inverse kinematics
-  float times[100] = { 0, 10, 20 };
+  float times[100] = { 0, 10, 20, 200 };
   float positions[100][6] = { 0 };
   float velocities[100][6] = { 0 };
 
@@ -928,6 +939,13 @@ void TrajectoryPlanner(void* pvParameters) {
   positions[2][3] = PI;
   positions[2][4] = (PI) / 4;
   positions[2][5] = PI;
+
+  positions[3][0] = -PI / 2;
+  positions[3][1] = (3 * PI) / 4;
+  positions[3][2] = (3 * PI) / 4;
+  positions[3][3] = PI;
+  positions[3][4] = (PI) / 4;
+  positions[3][5] = PI;
 
   // Initialize path points (this should be executed in runtime in reality)
 
