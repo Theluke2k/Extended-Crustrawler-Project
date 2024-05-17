@@ -752,8 +752,13 @@ void ControlTask(void* pvParameters) {
   //double w_n[6] = { 6, 10, 9, 20, 14, 30 };          // natural frequency of system
   //double z_n[6] = { 0.07, 0.05, 0.05, 1, 0.05, 1 };  // damping ratio of system
 
+  // Brugt til test1 med current
   double w_n[6] = { 6, 10, 10, 20, 14, 30 };          // natural frequency of system
   double z_n[6] = { 0.07, 0.05, 0.05, 1, 0.05, 1 };  // damping ratio of system
+
+  // Brugt til test3 med current
+  //double w_n[6] = { 10, 10, 11, 25, 14, 40 };          // natural frequency of system
+  //double z_n[6] = { 0.1, 0.05, 0.05, 1, 0.05, 1 };  // damping ratio of system
 
 
   // General Variables
