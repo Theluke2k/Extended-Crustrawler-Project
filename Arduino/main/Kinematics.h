@@ -9,7 +9,27 @@ float a2 = 0.222;
 float d4 = 0.198;
 float d6 = 0.24;
 
-/* ----- HOMOGENEOUS TRANSFORMATIONS ----- */
+/* ----- Convert euler angles to rotation matrix ----- */
+BLA::Matrix<3, 3> convertEuler2Matrix(float a, float b, float y) {
+  BLA::Matrix<3, 3> R;
+
+  R(0, 0) = cos(a) * cos(b);
+  R(0, 1) = cos(a) * sin(b) * sin(y) - sin(a) * cos(y);
+  R(0, 2) = cos(a) * sin(b) * cos(y) + sin(a) * sin(y);
+  R(1, 0) = sin(a) * cos(b);
+  R(1, 1) = sin(a) * sin(b) * sin(y) + cos(a) * cos(y);
+  R(1, 2) = sin(a) * sin(b) * cos(y) - cos(a) * sin(y);
+  R(2, 0) = -sin(b);
+  R(2, 1) = cos(b) * sin(y);
+  R(2, 2) = cos(b) * cos(y);
+
+  return R;
+}
+
+/* ----- FORWARD KINEMATIC EQUATIONS ----- */
+//FILL
+
+/* ----- HOMOGENEOUS TRANSFORMATIONS (unused) ----- */
 
 BLA::Matrix<4,4> getT01(float t1) {
   BLA::Matrix<4,4> T01 = { cos(t1),0,sin(t1),0,sin(t1),0,-cos(t1),0,0,1,0,0,0,0,0,1 };
