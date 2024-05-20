@@ -9,6 +9,57 @@ float a2 = 0.222;
 float d4 = 0.198;
 float d6 = 0.24;
 
+/* ----- FORWARD KINEMATIC EQUATIONS ----- */
+BLA::Matrix<3> getEEPosition(BLA::Matrix<6> q) {
+  BLA::Matrix<3> pos;
+  pos(0) = a2 * cos(q(0)) * cos(q(1)) + d4 * cos(q(0)) * sin(q(1) + q(2)) + d6 * (cos(q(0)) * (cos(q(1) + q(2)) * cos(q(3)) * sin(q(4)) + sin(q(1) + q(2)) * cos(q(4))) + sin(q(0)) * sin(q(3)) * sin(q(4)));
+  pos(1) = a2 * sin(q(0)) * cos(q(1)) + d4 * sin(q(0)) * sin(q(1) + q(2)) + d6 * (sin(q(0)) * (cos(q(1) + q(2)) * cos(q(3)) * sin(q(4)) + sin(q(1) + q(2)) * cos(q(4))) - cos(q(0)) * sin(q(3)) * sin(q(4)));
+  pos(2) = a2 * sin(q(1)) - d4 * cos(q(1) + q(2)) + d6 * (sin(q(1) + q(2)) * cos(q(3)) * sin(q(4)) - cos(q(1) + q(2)) * cos(q(4)));
+
+  return pos;
+}
+
+BLA::Matrix<3, 3> getEEOrientation(BLA::Matrix<6> q) {
+  BLA::Matrix<3, 3> ori;
+  ori(0, 0) = cos(q(0)) * (cos(q(1) + q(2)) * (cos(q(3)) * cos(q(4)) * cos(q(5)) - sin(q(3)) * sin(q(5))) - sin(q(1) + q(2)) * sin(q(4)) * cos(q(5))) + sin(q(0)) * (sin(q(3)) * cos(q(4)) * cos(q(5)) + cos(q(3)) * sin(q(5)));
+  ori(1, 0) = sin(q(0)) * (cos(q(1) + q(2)) * (cos(q(3)) * cos(q(4)) * cos(q(5)) - sin(q(3)) * sin(q(5))) - sin(q(1) + q(2)) * sin(q(4)) * cos(q(5))) - cos(q(0)) * (sin(q(3)) * cos(q(4)) * cos(q(5)) + cos(q(3)) * sin(q(5)));
+  ori(2, 0) = sin(q(1) + q(2)) * (cos(q(3)) * cos(q(4)) * cos(q(5)) - sin(q(3)) * sin(q(5))) + cos(q(1) + q(2)) * sin(q(4)) * cos(q(5));
+  ori(0, 1) = cos(q(0)) * ((-cos(q(1) + q(2)) * (cos(q(3)) * cos(q(4)) * sin(q(5)) + sin(q(3)) * cos(q(5)))) + sin(q(1) + q(2)) * sin(q(4)) * sin(q(5))) + sin(q(0)) * ((-sin(q(3)) * cos(q(4)) * sin(q(5)) + cos(q(3)) * cos(q(5))));
+  ori(1, 1) = sin(q(0)) * ((-cos(q(1) + q(2)) * (cos(q(3)) * cos(q(4)) * sin(q(5)) + sin(q(3)) * cos(q(5)))) + sin(q(1) + q(2)) * sin(q(4)) * sin(q(5))) - cos(q(0)) * ((-sin(q(3)) * cos(q(4)) * sin(q(5)) + cos(q(3)) * cos(q(5))));
+  ori(2, 1) = -sin(q(1) + q(2)) * (cos(q(3)) * cos(q(4)) * sin(q(5)) + sin(q(3)) * cos(q(5))) - cos(q(1) + q(2)) * sin(q(4)) * sin(q(5));
+  ori(0, 2) = cos(q(0)) * (cos(q(1) + q(2)) * cos(q(3)) * sin(q(4)) + sin(q(1) + q(2)) * cos(q(4))) + sin(q(0)) * sin(q(3)) * sin(q(4));
+  ori(1, 2) = sin(q(0)) * (cos(q(1) + q(2)) * cos(q(3)) * sin(q(4)) + sin(q(1) + q(2)) * cos(q(4))) - cos(q(0)) * sin(q(3)) * sin(q(4));
+  ori(2, 2) = sin(q(1) + q(2)) * cos(q(3)) * sin(q(4)) - cos(q(1) + q(2)) * cos(q(4));
+
+  return ori;
+}
+
+BLA::Matrix<3, 3> convertEuler2Matrix(float a, float b, float y) {
+  BLA::Matrix<3, 3> R;
+
+  R(0, 0) = cos(a) * cos(b);
+  R(0, 1) = cos(a) * sin(b) * sin(y) - sin(a) * cos(y);
+  R(0, 2) = cos(a) * sin(b) * cos(y) + sin(a) * sin(y);
+  R(1, 0) = sin(a) * cos(b);
+  R(1, 1) = sin(a) * sin(b) * sin(y) + cos(a) * cos(y);
+  R(1, 2) = sin(a) * sin(b) * cos(y) - cos(a) * sin(y);
+  R(2, 0) = -sin(b);
+  R(2, 1) = cos(b) * sin(y);
+  R(2, 2) = cos(b) * cos(y);
+
+  return R;
+}
+
+BLA::Matrix<3> convertMatrix2Euler(BLA::Matrix<3, 3> R) {
+  BLA::Matrix<3> euler;
+
+  euler(0) = atan2(R(1, 0), R(0, 0));
+  euler(1) = atan2(-R(2, 0), sqrt(R(2, 1)*R(2, 1) + R(2, 2)*R(2, 2)));
+  euler(2) = atan2(R(2, 1), R(2, 2));
+
+  return euler;
+}
+
 /* ----- HOMOGENEOUS TRANSFORMATIONS ----- */
 
 BLA::Matrix<4,4> getT01(float t1) {

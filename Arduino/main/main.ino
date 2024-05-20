@@ -524,7 +524,7 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
         }
 */
         //input_test = tau(i) * motorConstants[motorType][1] + M[i]->state.qd * motorConstants[motorType][3];
-        
+
         if (tau(i) < 0) {
           if (M[i]->state.qd < 0) {
             input_test = tau(i) * motorConstants[motorType][2] + M[i]->state.qd * motorConstants[motorType][3];
@@ -542,7 +542,7 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
             input_test = tau(i) * motorConstants[motorType][2] + M[i]->state.qd * motorConstants[motorType][3];
           }
         }
-        
+
 
         // Limit the PWM value
         if (input_test > 885) {
@@ -580,7 +580,7 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
   sucFlag = dxl.syncWrite(&sw_infos_pwm);
   xSemaphoreGive(motorComms);
   if (sucFlag == true) {
-/*
+    /*
     Serial.println("[SyncWrite] Success");
     for (int i = 0; i < sw_infos_pwm.xel_count; i++) {
       Serial.print("  ID: ");
@@ -594,7 +594,7 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
   sucFlag = dxl.syncWrite(&sw_infos_current);
   xSemaphoreGive(motorComms);
   if (sucFlag == true) {
-/*
+    /*
     Serial.println("[SyncWrite] Success");
     for (int i = 0; i < sw_infos_current.xel_count; i++) {
       Serial.print("  ID: ");
@@ -677,24 +677,6 @@ uint8_t UserInputListener() {
   return 0;
 }
 
-BLA::Matrix<3, 3> convertEuler2Matrix(float a, float b, float y) {
-  BLA::Matrix<3, 3> R;
-
-  R(0, 0) = cos(a) * cos(b);
-  R(0, 1) = cos(a) * sin(b) * sin(y) - sin(a) * cos(y);
-  R(0, 2) = cos(a) * sin(b) * cos(y) + sin(a) * sin(y);
-  R(1, 0) = sin(a) * cos(b);
-  R(1, 1) = sin(a) * sin(b) * sin(y) + cos(a) * cos(y);
-  R(1, 2) = sin(a) * sin(b) * cos(y) - cos(a) * sin(y);
-  R(2, 0) = -sin(b);
-  R(2, 1) = cos(b) * sin(y);
-  R(2, 2) = cos(b) * cos(y);
-
-  return R;
-}
-
-
-
 /* ----- UNUSED LOOP ----- */
 void loop() {
   // Empty loop since the scheduler will handle the task execution
@@ -724,13 +706,14 @@ void ControlTask(void* pvParameters) {
   //double z_n[6] = { 0.08, 0.05, 1, 0.05, 0.05, 1 };  // damping ratio of system
 
   // Denne er fin
-  double w_n[6] = { 1.85, 8, 9, 1, 5, 1 };          // natural frequency of system
+  double w_n[6] = { 1.85, 8, 9, 1, 5, 1 };              // natural frequency of system
   double z_n[6] = { 0.07, 0.05, 1, 0.01, 0.05, 0.01 };  // damping ratio of system
 
   // General Variables
   double timeCapture = 0;
   double inputTime = 0;
   double duration = 0;
+  char buffer[1000];
 
   // Define some structs used for computational optimization
   Pos q_op;
@@ -774,21 +757,33 @@ void ControlTask(void* pvParameters) {
   Kp.diagonal = { w_n[0] * w_n[0], w_n[1] * w_n[1], w_n[2] * w_n[2], w_n[3] * w_n[3], w_n[4] * w_n[4], w_n[5] * w_n[5] };
   Kd.diagonal = { 2 * z_n[0] * w_n[0], 2 * z_n[1] * w_n[1], 2 * z_n[2] * w_n[2], 2 * z_n[3] * w_n[3], 2 * z_n[4] * w_n[4], 2 * z_n[5] * w_n[5] };
 
+  // Pose displayed to user
+  BLA::Matrix<3> pos;
+  BLA::Matrix<3, 3> ori;
+  BLA::Matrix<3> oriEuler;
+  pos.Fill(0);
+  ori.Fill(0);
+  oriEuler.Fill(0);
+
+  // UTF-8 encoding for Greek letters
+  const char* alpha = "\xCE\xB1";
+  const char* beta = "\xCE\xB2";
+  const char* gamma = "\xCE\xB3";
+
   while (1) {
     duration = micros();
     timeoutFlag = 0;
     // Read position and velocity of the motor
     updateMotorState(M);
-    //Serial.println(micros() - duration);
+
+    // Insert motor state in vector
+    q = getCurrentPositionVector(M);
+    qd = getCurrentVelocityVector(M);
+
+    //Serial << "q: " << q << '\n';
+    //Serial << "qd: " << qd << '\n';
+
     if (inMotionFlag && !timeoutFlag) {
-
-      // Insert motor state in vector
-      q = getCurrentPositionVector(M);
-      qd = getCurrentVelocityVector(M);
-
-      //Serial << "q: " << q << '\n';
-      //Serial << "qd: " << qd << '\n';
-
       // Define some structs for computational optimization
       q_op = { q(0), q(1), q(2), q(3), q(4), q(5) };
       qd_op = { qd(0), qd(1), qd(2), qd(3), qd(4), qd(5) };
@@ -840,7 +835,7 @@ void ControlTask(void* pvParameters) {
       q_e = q_d - q;
       qd_e = qd_d - qd;
 
-      Serial << "q_e: " << q_e << '\n';
+      //Serial << "q_e: " << q_e << '\n';
       //Serial << "qd_e: " << qd_e << '\n';
 
       // Caluclate input to B(q)y block
@@ -871,9 +866,9 @@ void ControlTask(void* pvParameters) {
           tau(i) = Bqdd(i) + Cqd(i) + g(i);
         }
       }*/
-      
 
-      Serial << "tau: " << tau << '\n';
+
+      //Serial << "tau: " << tau << '\n';
       //Serial.println(micros() - duration);
       // Update the motor input depending on the operating mode
       updateMotorInput(tau, g);
@@ -882,12 +877,31 @@ void ControlTask(void* pvParameters) {
       Serial.println("TIMEOUT DETECTED");
     }
 
+    // Caluclate EE pose in operational space
+    pos = getEEPosition(q);
+    ori = getEEOrientation(q);
+    oriEuler = convertMatrix2Euler(ori);
+
+    // Print the pose to the user
+    snprintf(buffer, sizeof(buffer), "Position (XYZ) | Orientation (%s%s%s): %.2f,%.2f,%.2f | %.2f,%.2f,%.2f",
+             alpha,
+             beta,
+             gamma,
+             pos(0),
+             pos(1),
+             pos(2),
+             oriEuler(0),
+             oriEuler(1),
+             oriEuler(2));
+
+    //Serial.println(buffer);
+
     Serial.println(micros() - duration);
 
 
     //Serial.println();
 
-    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(20));
+    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(15));
   }
 }
 
@@ -935,7 +949,8 @@ void TrajectoryPlanner(void* pvParameters) {
   while (1) {
     // Trajectory should only be updated if the manipualtor is not already executing a trajectory
     if (!inMotionFlag) {
-      if (UserInputListener()) {  // format "time1 time2 , p11 p12 p13 o11 o12 o13 p21 p22 p23 o21 o22 o23"
+      if (1) {  // format "time1 time2 , p11 p12 p13 o11 o12 o13 p21 p22 p23 o21 o22 o23"
+        /*
         for (int i = 1; i <= Tr[1]->numberOfViaPoints; i++) {
           // Convert user input orientation to rotation matrix and to joint space
           R06 = convertEuler2Matrix(userPositions[i][3], userPositions[i][4], userPositions[i][5]);
@@ -1010,11 +1025,11 @@ void TrajectoryPlanner(void* pvParameters) {
             break;
           }
         }
-
+        
         Serial.print("VALIDINPUT: ");
         Serial.println(validInput);
-
-        if (validInput == true) {
+*/
+        if (1) {
           // Update motor state
           updateMotorState(M);
 
@@ -1069,7 +1084,7 @@ void TrajectoryPlanner(void* pvParameters) {
               Serial.println(Tr[i]->timeOffsets[j]);
             }
           }
-          if (validInput == true) {
+          if (1) {
             inMotionFlag = 1;
           }
         }
