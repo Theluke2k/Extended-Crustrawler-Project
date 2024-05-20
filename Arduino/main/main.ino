@@ -258,7 +258,7 @@ void setup() {
 
 /* ----- GENERAL FUNCTIONS -----*/
 // Updates the current state of the motor (reads position and velocity of all motors)
-void updateMotorState(Motor* M[6]) {
+void ReadMotorState(Motor* M[6]) {
   uint8_t recv_cnt;
   float sensitivity;
   double x = 0;
@@ -616,7 +616,7 @@ void ControlTask(void* pvParameters) {
 
   while (1) {
     // Read current position and velocity of motors
-    updateMotorState(M);
+    ReadMotorState(M);
 
     // Insert motor state in vector
     q = getCurrentPositionVector(M);
@@ -719,7 +719,7 @@ void TrajectoryPlanner(void* pvParameters) {
   BLA::Matrix<6> q;
 
   // If not already updated
-  updateMotorState(M);
+  ReadMotorState(M);
 
   // Array to hold the joint space path points converted from the user input using inverse kinematics
   float times[100] = { 0, 10, 20, 200 };
@@ -787,7 +787,7 @@ void TrajectoryPlanner(void* pvParameters) {
 
         if (validInput == true) {
           // Update motor state
-          updateMotorState(M);
+          ReadMotorState(M);
 
           // Create trajectories for each joint
           for (int i = 0; i < 6; i++) {
