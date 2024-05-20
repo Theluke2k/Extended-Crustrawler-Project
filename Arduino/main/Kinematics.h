@@ -1,5 +1,5 @@
-#ifndef KINEMATICS_H    // If STRUCTURES_H has not been defined yet,
-#define KINEMATICS_H    // define STRUCTURES_H
+#ifndef KINEMATICS_H  // If STRUCTURES_H has not been defined yet,
+#define KINEMATICS_H  // define STRUCTURES_H
 
 #include <BasicLinearAlgebra.h>
 
@@ -9,30 +9,82 @@ float a2 = 0.222;
 float d4 = 0.198;
 float d6 = 0.24;
 
+
+/* ----- FORWARD KINEMATIC EQUATIONS ----- */
+BLA::Matrix<3> getEEPosition(BLA::Matrix<6> q) {
+  BLA::Matrix<3> pos;
+  pos(0) = a2 * cos(q(0)) * cos(q(1)) + d4 * cos(q(0)) * sin(q(1) + q(2)) + d6 * (cos(q(0)) * (cos(q(1) + q(2)) * cos(q(3)) * sin(q(4)) + sin(q(1) + q(2)) * cos(q(4))) + sin(q(0)) * sin(q(3)) * sin(q(4)));
+  pos(1) = a2 * sin(q(0)) * cos(q(1)) + d4 * sin(q(0)) * sin(q(1) + q(2)) + d6 * (sin(q(0)) * (cos(q(1) + q(2)) * cos(q(3)) * sin(q(4)) + sin(q(1) + q(2)) * cos(q(4))) - cos(q(0)) * sin(q(3)) * sin(q(4)));
+  pos(2) = a2 * sin(q(1)) - d4 * cos(q(1) + q(2)) + d6 * (sin(q(1) + q(2)) * cos(q(3)) * sin(q(4)) - cos(q(1) + q(2)) * cos(q(4)));
+
+  return pos;
+}
+
+BLA::Matrix<3, 3> getEEOrientation(BLA::Matrix<6> q) {
+  BLA::Matrix<3, 3> ori;
+  ori(0, 0) = cos(q(0)) * (cos(q(1) + q(2)) * (cos(q(3)) * cos(q(4)) * cos(q(5)) - sin(q(3)) * sin(q(5))) - sin(q(1) + q(2)) * sin(q(4)) * cos(q(5))) + sin(q(0)) * (sin(q(3)) * cos(q(4)) * cos(q(5)) + cos(q(3)) * sin(q(5)));
+  ori(1, 0) = sin(q(0)) * (cos(q(1) + q(2)) * (cos(q(3)) * cos(q(4)) * cos(q(5)) - sin(q(3)) * sin(q(5))) - sin(q(1) + q(2)) * sin(q(4)) * cos(q(5))) - cos(q(0)) * (sin(q(3)) * cos(q(4)) * cos(q(5)) + cos(q(3)) * sin(q(5)));
+  ori(2, 0) = sin(q(1) + q(2)) * (cos(q(3)) * cos(q(4)) * cos(q(5)) - sin(q(3)) * sin(q(5))) + cos(q(1) + q(2)) * sin(q(4)) * cos(q(5));
+  ori(0, 1) = cos(q(0)) * ((-cos(q(1) + q(2)) * (cos(q(3)) * cos(q(4)) * sin(q(5)) + sin(q(3)) * cos(q(5)))) + sin(q(1) + q(2)) * sin(q(4)) * sin(q(5))) + sin(q(0)) * ((-sin(q(3)) * cos(q(4)) * sin(q(5)) + cos(q(3)) * cos(q(5))));
+  ori(1, 1) = sin(q(0)) * ((-cos(q(1) + q(2)) * (cos(q(3)) * cos(q(4)) * sin(q(5)) + sin(q(3)) * cos(q(5)))) + sin(q(1) + q(2)) * sin(q(4)) * sin(q(5))) - cos(q(0)) * ((-sin(q(3)) * cos(q(4)) * sin(q(5)) + cos(q(3)) * cos(q(5))));
+  ori(2, 1) = -sin(q(1) + q(2)) * (cos(q(3)) * cos(q(4)) * sin(q(5)) + sin(q(3)) * cos(q(5))) - cos(q(1) + q(2)) * sin(q(4)) * sin(q(5));
+  ori(0, 2) = cos(q(0)) * (cos(q(1) + q(2)) * cos(q(3)) * sin(q(4)) + sin(q(1) + q(2)) * cos(q(4))) + sin(q(0)) * sin(q(3)) * sin(q(4));
+  ori(1, 2) = sin(q(0)) * (cos(q(1) + q(2)) * cos(q(3)) * sin(q(4)) + sin(q(1) + q(2)) * cos(q(4))) - cos(q(0)) * sin(q(3)) * sin(q(4));
+  ori(2, 2) = sin(q(1) + q(2)) * cos(q(3)) * sin(q(4)) - cos(q(1) + q(2)) * cos(q(4));
+
+  return ori;
+}
+
+BLA::Matrix<3, 3> convertEuler2Matrix(float a, float b, float y) {
+  BLA::Matrix<3, 3> R;
+
+  R(0, 0) = cos(a) * cos(b);
+  R(0, 1) = cos(a) * sin(b) * sin(y) - sin(a) * cos(y);
+  R(0, 2) = cos(a) * sin(b) * cos(y) + sin(a) * sin(y);
+  R(1, 0) = sin(a) * cos(b);
+  R(1, 1) = sin(a) * sin(b) * sin(y) + cos(a) * cos(y);
+  R(1, 2) = sin(a) * sin(b) * cos(y) - cos(a) * sin(y);
+  R(2, 0) = -sin(b);
+  R(2, 1) = cos(b) * sin(y);
+  R(2, 2) = cos(b) * cos(y);
+
+  return R;
+}
+
+BLA::Matrix<3> convertMatrix2Euler(BLA::Matrix<3, 3> R) {
+  BLA::Matrix<3> euler;
+
+  euler(0) = atan2(R(1, 0), R(0, 0));
+  euler(1) = atan2(-R(2, 0), sqrt(R(2, 1)*R(2, 1) + R(2, 2)*R(2, 2)));
+  euler(2) = atan2(R(2, 1), R(2, 2));
+
+  return euler;
+}
+
 /* ----- HOMOGENEOUS TRANSFORMATIONS ----- */
 
-BLA::Matrix<4,4> getT01(float t1) {
-  BLA::Matrix<4,4> T01 = { cos(t1),0,sin(t1),0,sin(t1),0,-cos(t1),0,0,1,0,0,0,0,0,1 };
+BLA::Matrix<4, 4> getT01(float t1) {
+  BLA::Matrix<4, 4> T01 = { cos(t1), 0, sin(t1), 0, sin(t1), 0, -cos(t1), 0, 0, 1, 0, 0, 0, 0, 0, 1 };
   return T01;
 }
-BLA::Matrix<4,4> getT12(float t2) {
-  BLA::Matrix<4,4> T12 = { cos(t2),-sin(t2),0,a2*cos(t2),sin(t2),cos(t2),0,a2*sin(t2),0,0,1,0,0,0,0,1 };
+BLA::Matrix<4, 4> getT12(float t2) {
+  BLA::Matrix<4, 4> T12 = { cos(t2), -sin(t2), 0, a2 * cos(t2), sin(t2), cos(t2), 0, a2 * sin(t2), 0, 0, 1, 0, 0, 0, 0, 1 };
   return T12;
 }
-BLA::Matrix<4,4> getT23(float t3) {
-  BLA::Matrix<4,4> T23 = { cos(t3),0,sin(t3),0,sin(t3),0,-cos(t3),0,0,1,0,0,0,0,0,1 };
+BLA::Matrix<4, 4> getT23(float t3) {
+  BLA::Matrix<4, 4> T23 = { cos(t3), 0, sin(t3), 0, sin(t3), 0, -cos(t3), 0, 0, 1, 0, 0, 0, 0, 0, 1 };
   return T23;
 }
-BLA::Matrix<4,4> getT34(float t4) {
-  BLA::Matrix<4,4> T34 = { cos(t4),0,-sin(t4),0,sin(t4),0,cos(t4),0,0,-1,0,d4,0,0,0,1 };
+BLA::Matrix<4, 4> getT34(float t4) {
+  BLA::Matrix<4, 4> T34 = { cos(t4), 0, -sin(t4), 0, sin(t4), 0, cos(t4), 0, 0, -1, 0, d4, 0, 0, 0, 1 };
   return T34;
 }
-BLA::Matrix<4,4> getT45(float t5) {
-  BLA::Matrix<4,4> T45 = { cos(t5),0,sin(t5),0,sin(t5),0,-cos(t5),0,0,1,0,0,0,0,0,1 };
+BLA::Matrix<4, 4> getT45(float t5) {
+  BLA::Matrix<4, 4> T45 = { cos(t5), 0, sin(t5), 0, sin(t5), 0, -cos(t5), 0, 0, 1, 0, 0, 0, 0, 0, 1 };
   return T45;
 }
-BLA::Matrix<4,4> getT56(float t6) {
-  BLA::Matrix<4,4> T56 = { cos(t6),-sin(t6),0,0,sin(t6),cos(t6),0,0,0,0,1,d6,0,0,0,1 };
+BLA::Matrix<4, 4> getT56(float t6) {
+  BLA::Matrix<4, 4> T56 = { cos(t6), -sin(t6), 0, 0, sin(t6), cos(t6), 0, 0, 0, 0, 1, d6, 0, 0, 0, 1 };
   return T56;
 }
 
@@ -164,30 +216,30 @@ BLA::Matrix<6> InverseKinematics(double p1, double p2, double p3, BLA::Matrix<3,
   Serial.println(t3,5);
   Serial.println();
   */
-  BLA::Matrix<4,4> T03 = getT01(t1) * getT12(t2) * getT23(t3);
+  BLA::Matrix<4, 4> T03 = getT01(t1) * getT12(t2) * getT23(t3);
 
   //Serial << "T03 " << T03 << '\n';
 
   // Extract rotation matrix from homogeneous transformation
-  BLA::Matrix<3,3> R03;
-  for(int i = 0; i < 3; i++) {
-    for(int j = 0; j < 3; j++) {
-      R03(i,j) = T03(i,j);
+  BLA::Matrix<3, 3> R03;
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      R03(i, j) = T03(i, j);
     }
   }
   //Serial << "R03 " << R03 << '\n';
 
   // Calculate R36
-  BLA::Matrix<3,3> R36 = ~R03 * R06;
+  BLA::Matrix<3, 3> R36 = ~R03 * R06;
 
   //Serial << "R36 " << R36 << '\n';
 
   // Keep notationa from MATLAB script
-  float nz3 = R36(2,0);
-  float sz3 = R36(2,1);
-  float ax3 = R36(0,2);
-  float ay3 = R36(1,2);
-  float az3 = R36(2,2);
+  float nz3 = R36(2, 0);
+  float sz3 = R36(2, 1);
+  float ax3 = R36(0, 2);
+  float ay3 = R36(1, 2);
+  float az3 = R36(2, 2);
   /*
   Serial.println(nz3);
   Serial.println(sz3);
@@ -214,12 +266,11 @@ BLA::Matrix<6> InverseKinematics(double p1, double p2, double p3, BLA::Matrix<3,
   Serial.println();
   */
 
-  if(choice2 == 1) {
+  if (choice2 == 1) {
     q(3) = t4_I;
     q(4) = t5_I;
     q(5) = t6_I;
-  }
-  else {
+  } else {
     q(3) = t4_II;
     q(4) = t5_II;
     q(5) = t6_II;
@@ -228,4 +279,4 @@ BLA::Matrix<6> InverseKinematics(double p1, double p2, double p3, BLA::Matrix<3,
   return q;
 }
 
-#endif // KINEMATICS_H
+#endif  // KINEMATICS_H

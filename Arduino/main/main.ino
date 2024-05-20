@@ -595,23 +595,6 @@ uint8_t UserInputListener() {
   return 0;
 }
 
-BLA::Matrix<3, 3> convertEuler2Matrix(float a, float b, float y) {
-  BLA::Matrix<3, 3> R;
-
-  R(0, 0) = cos(a) * cos(b);
-  R(0, 1) = cos(a) * sin(b) * sin(y) - sin(a) * cos(y);
-  R(0, 2) = cos(a) * sin(b) * cos(y) + sin(a) * sin(y);
-  R(1, 0) = sin(a) * cos(b);
-  R(1, 1) = sin(a) * sin(b) * sin(y) + cos(a) * cos(y);
-  R(1, 2) = sin(a) * sin(b) * cos(y) - cos(a) * sin(y);
-  R(2, 0) = -sin(b);
-  R(2, 1) = cos(b) * sin(y);
-  R(2, 2) = cos(b) * cos(y);
-
-  return R;
-}
-
-
 
 /* ----- UNUSED LOOP ----- */
 void loop() {
@@ -675,17 +658,14 @@ void ControlTask(void* pvParameters) {
   // Virkede bedre men skal 2 skal måkse have mere dæmpning
   //double w_n[6] = { 15, 12, 20, 25, 23, 40 };          // natural frequency of system
   //double z_n[6] = { 0.2, 0.2, 0.3, 1, 0.3, 1 };  // damping ratio of system
-  
+
   // Virkede god men 1 eteren skal have lidt dæmpning
   //double w_n[6] = { 15, 12, 20, 25, 23, 40 };          // natural frequency of system
   //double z_n[6] = { 0.2, 0.25, 0.3, 1, 0.3, 1 };  // damping ratio of system
 
   // Brugt til simple movement test (PWM)
-  double w_n[6] = { 15, 12, 20, 25, 23, 40 };          // natural frequency of system
+  double w_n[6] = { 15, 12, 20, 25, 23, 40 };     // natural frequency of system
   double z_n[6] = { 0.4, 0.25, 0.3, 1, 0.3, 1 };  // damping ratio of system
-
-  
-
 
   // General Variables
   double timeCapture = 0;
@@ -734,6 +714,15 @@ void ControlTask(void* pvParameters) {
   Kd.diagonal.Fill(0);
   Kp.diagonal = { w_n[0] * w_n[0], w_n[1] * w_n[1], w_n[2] * w_n[2], w_n[3] * w_n[3], w_n[4] * w_n[4], w_n[5] * w_n[5] };
   Kd.diagonal = { 2 * z_n[0] * w_n[0], 2 * z_n[1] * w_n[1], 2 * z_n[2] * w_n[2], 2 * z_n[3] * w_n[3], 2 * z_n[4] * w_n[4], 2 * z_n[5] * w_n[5] };
+
+  // Pose displayed to user
+  BLA::Matrix<3> pos;
+  BLA::Matrix<3, 3> ori;
+  BLA::Matrix<3> oriEuler;
+  pos.Fill(0);
+  ori.Fill(0);
+  oriEuler.Fill(0);
+
 
   while (1) {
     //Serial.println(millis());
@@ -871,9 +860,8 @@ void ControlTask(void* pvParameters) {
                M3.input,
                M4.input,
                M5.input,
-               M6.input
-               );
-      
+               M6.input);
+
       /*
       snprintf(buffer, sizeof(buffer), "%lu,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f",
                millis(),
@@ -896,7 +884,7 @@ void ControlTask(void* pvParameters) {
               q_e(4),
               q_e(5));
               */
-      Serial.println(buffer);
+      //Serial.println(buffer);
 
       //Serial << "tau: " << tau << '\n';
       //Serial.println(micros() - duration);
@@ -907,12 +895,29 @@ void ControlTask(void* pvParameters) {
       Serial.println("TIMEOUT DETECTED");
     }
 
-    //Serial.println(micros() - duration);
+    // Caluclate EE pose in operational space
+    pos = getEEPosition(q);
+    ori = getEEOrientation(q);
+    oriEuler = convertMatrix2Euler(ori);
+
+    // Print the pose to the user
+    snprintf(buffer, sizeof(buffer), "%.2f,%.2f,%.2f,%.2f,%.2f,%.2f",
+               pos(0),
+               pos(1),
+               pos(2),
+               oriEuler(0),
+               oriEuler(1),
+               oriEuler(2)
+               );
+              
+      Serial.println(buffer);
+
+      //Serial.println(micros() - duration);
 
 
-    //Serial.println();
+      //Serial.println();
 
-    vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(15));
+      vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(15));
   }
 }
 
