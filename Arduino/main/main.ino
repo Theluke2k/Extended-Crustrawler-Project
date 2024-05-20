@@ -601,15 +601,28 @@ void ControlTask(void* pvParameters) {
   Kp.diagonal = { w_n[0] * w_n[0], w_n[1] * w_n[1], w_n[2] * w_n[2], w_n[3] * w_n[3], w_n[4] * w_n[4], w_n[5] * w_n[5] };
   Kd.diagonal = { 2 * z_n[0] * w_n[0], 2 * z_n[1] * w_n[1], 2 * z_n[2] * w_n[2], 2 * z_n[3] * w_n[3], 2 * z_n[4] * w_n[4], 2 * z_n[5] * w_n[5] };
 
+  // Pose displayed to user
+  BLA::Matrix<3> pos;
+  BLA::Matrix<3, 3> ori;
+  BLA::Matrix<3> oriEuler;
+  pos.Fill(0);
+  ori.Fill(0);
+  oriEuler.Fill(0);
+
+  // UTF-8 encoding for Greek letters
+  const char* alpha = "\xCE\xB1";
+  const char* beta = "\xCE\xB2";
+  const char* gamma = "\xCE\xB3";
+
   while (1) {
     // Read current position and velocity of motors
     updateMotorState(M);
 
-    if (inMotionFlag) {
+    // Insert motor state in vector
+    q = getCurrentPositionVector(M);
+    qd = getCurrentVelocityVector(M);
 
-      // Insert motor state in vector
-      q = getCurrentPositionVector(M);
-      qd = getCurrentVelocityVector(M);
+    if (inMotionFlag) {
 
       // Define some structs for computational optimization
       q_op = { q(0), q(1), q(2), q(3), q(4), q(5) };
@@ -667,8 +680,26 @@ void ControlTask(void* pvParameters) {
 
       // Update the motor input depending on the operating mode
       updateMotorInput(tau, g);
-
     }
+
+    // Caluclate EE pose in operational space
+    pos = getEEPosition(q);
+    ori = getEEOrientation(q);
+    oriEuler = convertMatrix2Euler(ori);
+
+    // Print the pose to the user
+    snprintf(buffer, sizeof(buffer), "Position (XYZ) | Orientation (%s%s%s): %.2f,%.2f,%.2f | %.2f,%.2f,%.2f",
+             alpha,
+             beta,
+             gamma,
+             pos(0),
+             pos(1),
+             pos(2),
+             oriEuler(0),
+             oriEuler(1),
+             oriEuler(2));
+
+    Serial.println(buffer);
 
     // Task period
     vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(15));

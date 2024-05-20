@@ -9,7 +9,31 @@ float a2 = 0.222;
 float d4 = 0.198;
 float d6 = 0.24;
 
-/* ----- Convert euler angles to rotation matrix ----- */
+/* ----- FORWARD KINEMATIC EQUATIONS ----- */
+BLA::Matrix<3> getEEPosition(BLA::Matrix<6> q) {
+  BLA::Matrix<3> pos;
+  pos(0) = a2 * cos(q(0)) * cos(q(1)) + d4 * cos(q(0)) * sin(q(1) + q(2)) + d6 * (cos(q(0)) * (cos(q(1) + q(2)) * cos(q(3)) * sin(q(4)) + sin(q(1) + q(2)) * cos(q(4))) + sin(q(0)) * sin(q(3)) * sin(q(4)));
+  pos(1) = a2 * sin(q(0)) * cos(q(1)) + d4 * sin(q(0)) * sin(q(1) + q(2)) + d6 * (sin(q(0)) * (cos(q(1) + q(2)) * cos(q(3)) * sin(q(4)) + sin(q(1) + q(2)) * cos(q(4))) - cos(q(0)) * sin(q(3)) * sin(q(4)));
+  pos(2) = a2 * sin(q(1)) - d4 * cos(q(1) + q(2)) + d6 * (sin(q(1) + q(2)) * cos(q(3)) * sin(q(4)) - cos(q(1) + q(2)) * cos(q(4)));
+
+  return pos;
+}
+
+BLA::Matrix<3, 3> getEEOrientation(BLA::Matrix<6> q) {
+  BLA::Matrix<3, 3> ori;
+  ori(0, 0) = cos(q(0)) * (cos(q(1) + q(2)) * (cos(q(3)) * cos(q(4)) * cos(q(5)) - sin(q(3)) * sin(q(5))) - sin(q(1) + q(2)) * sin(q(4)) * cos(q(5))) + sin(q(0)) * (sin(q(3)) * cos(q(4)) * cos(q(5)) + cos(q(3)) * sin(q(5)));
+  ori(1, 0) = sin(q(0)) * (cos(q(1) + q(2)) * (cos(q(3)) * cos(q(4)) * cos(q(5)) - sin(q(3)) * sin(q(5))) - sin(q(1) + q(2)) * sin(q(4)) * cos(q(5))) - cos(q(0)) * (sin(q(3)) * cos(q(4)) * cos(q(5)) + cos(q(3)) * sin(q(5)));
+  ori(2, 0) = sin(q(1) + q(2)) * (cos(q(3)) * cos(q(4)) * cos(q(5)) - sin(q(3)) * sin(q(5))) + cos(q(1) + q(2)) * sin(q(4)) * cos(q(5));
+  ori(0, 1) = cos(q(0)) * ((-cos(q(1) + q(2)) * (cos(q(3)) * cos(q(4)) * sin(q(5)) + sin(q(3)) * cos(q(5)))) + sin(q(1) + q(2)) * sin(q(4)) * sin(q(5))) + sin(q(0)) * ((-sin(q(3)) * cos(q(4)) * sin(q(5)) + cos(q(3)) * cos(q(5))));
+  ori(1, 1) = sin(q(0)) * ((-cos(q(1) + q(2)) * (cos(q(3)) * cos(q(4)) * sin(q(5)) + sin(q(3)) * cos(q(5)))) + sin(q(1) + q(2)) * sin(q(4)) * sin(q(5))) - cos(q(0)) * ((-sin(q(3)) * cos(q(4)) * sin(q(5)) + cos(q(3)) * cos(q(5))));
+  ori(2, 1) = -sin(q(1) + q(2)) * (cos(q(3)) * cos(q(4)) * sin(q(5)) + sin(q(3)) * cos(q(5))) - cos(q(1) + q(2)) * sin(q(4)) * sin(q(5));
+  ori(0, 2) = cos(q(0)) * (cos(q(1) + q(2)) * cos(q(3)) * sin(q(4)) + sin(q(1) + q(2)) * cos(q(4))) + sin(q(0)) * sin(q(3)) * sin(q(4));
+  ori(1, 2) = sin(q(0)) * (cos(q(1) + q(2)) * cos(q(3)) * sin(q(4)) + sin(q(1) + q(2)) * cos(q(4))) - cos(q(0)) * sin(q(3)) * sin(q(4));
+  ori(2, 2) = sin(q(1) + q(2)) * cos(q(3)) * sin(q(4)) - cos(q(1) + q(2)) * cos(q(4));
+
+  return ori;
+}
+
 BLA::Matrix<3, 3> convertEuler2Matrix(float a, float b, float y) {
   BLA::Matrix<3, 3> R;
 
@@ -26,29 +50,14 @@ BLA::Matrix<3, 3> convertEuler2Matrix(float a, float b, float y) {
   return R;
 }
 
-/* ----- FORWARD KINEMATIC EQUATIONS ----- */
-BLA::Matrix<3> getEEPosition(BLA::Matrix<6> q) {
-    BLA::Matrix<3> pos;
-    pos(0) = a2*cos(q(0))*cos(q(1)) + d4*cos(q(0))*sin(q(1)+q(2)) + d6*(cos(q(0))*(cos(q(1)+q(2))*cos(q(3))*sin(q(4)) + sin(q(1)+q(2))*cos(q(4))) + sin(q(0))*sin(q(3))*sin(q(4)));
-    pos(1) = a2*sin(q(0))*cos(q(1)) + d4*sin(q(0))*sin(q(1)+q(2)) + d6*(sin(q(0))*(cos(q(1)+q(2))*cos(q(3))*sin(q(4)) + sin(q(1)+q(2))*cos(q(4))) - cos(q(0))*sin(q(3))*sin(q(4)));
-    pos(2) = a2*sin(q(1)) - d4*cos(q(1)+q(2)) + d6*(sin(q(1)+q(2))*cos(q(3))*sin(q(4)) - cos(q(1)+q(2))*cos(q(4)));
+BLA::Matrix<3> convertMatrix2Euler(BLA::Matrix<3, 3> R) {
+  BLA::Matrix<3> euler;
 
-    return pos;
-}
+  euler(0) = atan2(R(1, 0), R(0, 0));
+  euler(1) = atan2(-R(2, 0), sqrt(R(2, 1)*R(2, 1) + R(2, 2)*R(2, 2)));
+  euler(2) = atan2(R(2, 1), R(2, 2));
 
-BLA::Matrix<3,3> getEEOrientation(BLA::Matrix<6> q) {
-  BLA::Matrix<3,3> ori;
-  ori(0,0) = cos(q(0))*(cos(q(1)+q(2))*(cos(q(3))*cos(q(4))*cos(q(5)) - sin(q(3))*sin(q(5))) - sin(q(1)+q(2))*sin(q(4))*cos(q(5))) + sin(q(0))*(sin(q(3))*cos(q(4))*cos(q(5)) + cos(q(3))*sin(q(5)));
-  ori(1,0) = sin(q(0))*(cos(q(1)+q(2))*(cos(q(3))*cos(q(4))*cos(q(5)) - sin(q(3))*sin(q(5))) - sin(q(1)+q(2))*sin(q(4))*cos(q(5))) - cos(q(0))*(sin(q(3))*cos(q(4))*cos(q(5)) + cos(q(3))*sin(q(5)));
-  ori(2,0) = sin(q(1)+q(2))*(cos(q(3))*cos(q(4))*cos(q(5)) - sin(q(3))*sin(q(5))) + cos(q(1)+q(2))*sin(q(4))*cos(q(5));
-  ori(0,1) = cos(q(0))*((-cos(q(1)+q(2))*(cos(q(3))*cos(q(4))*sin(q(5)) + sin(q(3))*cos(q(5)))) + sin(q(1)+q(2))*sin(q(4))*sin(q(5))) + sin(q(0))*((-sin(q(3))*cos(q(4))*sin(q(5)) + cos(q(3))*cos(q(5))));
-  ori(1,1) = sin(q(0))*((-cos(q(1)+q(2))*(cos(q(3))*cos(q(4))*sin(q(5)) + sin(q(3))*cos(q(5)))) + sin(q(1)+q(2))*sin(q(4))*sin(q(5))) - cos(q(0))*((-sin(q(3))*cos(q(4))*sin(q(5)) + cos(q(3))*cos(q(5))));
-  ori(2,1) = -sin(q(1)+q(2))*(cos(q(3))*cos(q(4))*sin(q(5)) + sin(q(3))*cos(q(5))) - cos(q(1)+q(2))*sin(q(4))*sin(q(5));
-  ori(0,2) = cos(q(0))*(cos(q(1)+q(2))*cos(q(3))*sin(q(4)) + sin(q(1)+q(2))*cos(q(4))) + sin(q(0))*sin(q(3))*sin(q(4));
-  ori(1,2) = sin(q(0))*(cos(q(1)+q(2))*cos(q(3))*sin(q(4)) + sin(q(1)+q(2))*cos(q(4))) - cos(q(0))*sin(q(3))*sin(q(4));
-  ori(2,2) = sin(q(1)+q(2))*cos(q(3))*sin(q(4)) - cos(q(1)+q(2))*cos(q(4));
-
-  return ori;
+  return euler;
 }
 
 /* ----- HOMOGENEOUS TRANSFORMATIONS (unused) ----- */
