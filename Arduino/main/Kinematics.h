@@ -27,7 +27,29 @@ BLA::Matrix<3, 3> convertEuler2Matrix(float a, float b, float y) {
 }
 
 /* ----- FORWARD KINEMATIC EQUATIONS ----- */
-//FILL
+BLA::Matrix<3> getEEPosition(BLA::Matrix<6> q) {
+    BLA::Matrix<3> pos;
+    pos(0) = a2*cos(q(0))*cos(q(1)) + d4*cos(q(0))*sin(q(1)+q(2)) + d6*(cos(q(0))*(cos(q(1)+q(2))*cos(q(3))*sin(q(4)) + sin(q(1)+q(2))*cos(q(4))) + sin(q(0))*sin(q(3))*sin(q(4)));
+    pos(1) = a2*sin(q(0))*cos(q(1)) + d4*sin(q(0))*sin(q(1)+q(2)) + d6*(sin(q(0))*(cos(q(1)+q(2))*cos(q(3))*sin(q(4)) + sin(q(1)+q(2))*cos(q(4))) - cos(q(0))*sin(q(3))*sin(q(4)));
+    pos(2) = a2*sin(q(1)) - d4*cos(q(1)+q(2)) + d6*(sin(q(1)+q(2))*cos(q(3))*sin(q(4)) - cos(q(1)+q(2))*cos(q(4)));
+
+    return pos;
+}
+
+BLA::Matrix<3,3> getEEOrientation(BLA::Matrix<6> q) {
+  BLA::Matrix<3,3> ori;
+  ori(0,0) = cos(q(0))*(cos(q(1)+q(2))*(cos(q(3))*cos(q(4))*cos(q(5)) - sin(q(3))*sin(q(5))) - sin(q(1)+q(2))*sin(q(4))*cos(q(5))) + sin(q(0))*(sin(q(3))*cos(q(4))*cos(q(5)) + cos(q(3))*sin(q(5)));
+  ori(1,0) = sin(q(0))*(cos(q(1)+q(2))*(cos(q(3))*cos(q(4))*cos(q(5)) - sin(q(3))*sin(q(5))) - sin(q(1)+q(2))*sin(q(4))*cos(q(5))) - cos(q(0))*(sin(q(3))*cos(q(4))*cos(q(5)) + cos(q(3))*sin(q(5)));
+  ori(2,0) = sin(q(1)+q(2))*(cos(q(3))*cos(q(4))*cos(q(5)) - sin(q(3))*sin(q(5))) + cos(q(1)+q(2))*sin(q(4))*cos(q(5));
+  ori(0,1) = cos(q(0))*((-cos(q(1)+q(2))*(cos(q(3))*cos(q(4))*sin(q(5)) + sin(q(3))*cos(q(5)))) + sin(q(1)+q(2))*sin(q(4))*sin(q(5))) + sin(q(0))*((-sin(q(3))*cos(q(4))*sin(q(5)) + cos(q(3))*cos(q(5))));
+  ori(1,1) = sin(q(0))*((-cos(q(1)+q(2))*(cos(q(3))*cos(q(4))*sin(q(5)) + sin(q(3))*cos(q(5)))) + sin(q(1)+q(2))*sin(q(4))*sin(q(5))) - cos(q(0))*((-sin(q(3))*cos(q(4))*sin(q(5)) + cos(q(3))*cos(q(5))));
+  ori(2,1) = -sin(q(1)+q(2))*(cos(q(3))*cos(q(4))*sin(q(5)) + sin(q(3))*cos(q(5))) - cos(q(1)+q(2))*sin(q(4))*sin(q(5));
+  ori(0,2) = cos(q(0))*(cos(q(1)+q(2))*cos(q(3))*sin(q(4)) + sin(q(1)+q(2))*cos(q(4))) + sin(q(0))*sin(q(3))*sin(q(4));
+  ori(1,2) = sin(q(0))*(cos(q(1)+q(2))*cos(q(3))*sin(q(4)) + sin(q(1)+q(2))*cos(q(4))) - cos(q(0))*sin(q(3))*sin(q(4));
+  ori(2,2) = sin(q(1)+q(2))*cos(q(3))*sin(q(4)) - cos(q(1)+q(2))*cos(q(4));
+
+  return ori;
+}
 
 /* ----- HOMOGENEOUS TRANSFORMATIONS (unused) ----- */
 
