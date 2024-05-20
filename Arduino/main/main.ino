@@ -922,27 +922,34 @@ void TrajectoryPlanner(void* pvParameters) {
   updateMotorState(M);
 
   // Array to hold the joint space path points converted from the user input using inverse kinematics
-  float times[100] = { 0, 5, 10 };
+  float times[100] = { 0, 10, 20, 200 };
   float positions[100][6] = { 0 };
   float velocities[100][6] = { 0 };
-  /*
+
   // Initialize some inputs for tests
   // First point
-  positions[1][0] = PI / 4;
+  positions[1][0] = 0;
   positions[1][1] = PI / 4;
   positions[1][2] = PI / 4;
-  positions[1][3] = PI / 4;
-  positions[1][4] = PI / 4;
-  positions[1][5] = PI / 4;
+  positions[1][3] = 0;
+  positions[1][4] = -PI / 4;
+  positions[1][5] = 0;
 
   // Second point
-  positions[2][0] = PI / 2;
-  positions[2][1] = PI / 2;
-  positions[2][2] = PI / 2;
-  positions[2][3] = PI / 2;
-  positions[2][4] = PI / 2;
-  positions[2][5] = PI / 2;
-  */
+  positions[2][0] = -PI / 2;
+  positions[2][1] = (3 * PI) / 4;
+  positions[2][2] = (3 * PI) / 4;
+  positions[2][3] = PI;
+  positions[2][4] = (PI) / 4;
+  positions[2][5] = PI;
+
+  positions[3][0] = -PI / 2;
+  positions[3][1] = (3 * PI) / 4;
+  positions[3][2] = (3 * PI) / 4;
+  positions[3][3] = PI;
+  positions[3][4] = (PI) / 4;
+  positions[3][5] = PI;
+  
   // Initialize path points (this should be executed in runtime in reality)
 
 
