@@ -550,8 +550,12 @@ void ControlTask(void* pvParameters) {
   TickType_t lastWakeTime = xTaskGetTickCount();
 
   // Controller parameters: Brugt til simple movement test (PWM)
-  double w_n[6] = { 15, 12, 20, 25, 23, 40 };     // natural frequency of system
-  double z_n[6] = { 0.4, 0.25, 0.3, 1, 0.3, 1 };  // damping ratio of system
+  //double w_n[6] = { 15, 12, 20, 25, 23, 40 };     // natural frequency of system
+  //double z_n[6] = { 0.4, 0.25, 0.3, 1, 0.3, 1 };  // damping ratio of system
+
+  // Controller parameters: Brugt til simple movement test (PWM)
+  double w_n[6] = { 12, 15, 15, 25, 15, 40 };     // natural frequency of system
+  double z_n[6] = { 0.4, 0.3, 0.3, 1, 0.3, 1 };  // damping ratio of system
 
   // General Variables
   double timeCapture = 0;
@@ -615,6 +619,8 @@ void ControlTask(void* pvParameters) {
   const char* gamma = "\xCE\xB3";
 
   while (1) {
+
+    duration = micros();
     // Read current position and velocity of motors
     ReadMotorState(M);
 
@@ -681,7 +687,7 @@ void ControlTask(void* pvParameters) {
       // Update the motor input depending on the operating mode
       updateMotorInput(tau, g);
     }
-
+  /*
     // Caluclate EE pose in operational space
     pos = getEEPosition(q);
     ori = getEEOrientation(q);
@@ -698,9 +704,10 @@ void ControlTask(void* pvParameters) {
              oriEuler(0),
              oriEuler(1),
              oriEuler(2));
+  */
+    //Serial.println(buffer);
 
-    Serial.println(buffer);
-
+    //Serial.println(micros() - duration);
     // Task period
     vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(15));
   }
