@@ -723,6 +723,10 @@ void ControlTask(void* pvParameters) {
   ori.Fill(0);
   oriEuler.Fill(0);
 
+  // UTF-8 encoding for Greek letters
+  const char* alpha = "\xCE\xB1";
+  const char* beta = "\xCE\xB2";
+  const char* gamma = "\xCE\xB3";
 
   while (1) {
     //Serial.println(millis());
@@ -901,21 +905,25 @@ void ControlTask(void* pvParameters) {
     oriEuler = convertMatrix2Euler(ori);
 
     // Print the pose to the user
-    snprintf(buffer, sizeof(buffer), "%.2f,%.2f,%.2f,%.2f,%.2f,%.2f",
-               pos(0),
-               pos(1),
-               pos(2),
-               oriEuler(0),
-               oriEuler(1),
-               oriEuler(2)
-               );
-              
-      Serial.println(buffer);
+    snprintf(buffer, sizeof(buffer), "Position (XYZ) | Orientation (%s%s%s): %.2f,%.2f,%.2f | %.2f,%.2f,%.2f",
+             alpha,
+             beta,
+             gamma,
+             pos(0),
+             pos(1),
+             pos(2),
+             oriEuler(0),
+             oriEuler(1),
+             oriEuler(2));
+
+    Serial.println(buffer);
 
       //Serial.println(micros() - duration);
 
 
       //Serial.println();
+
+      
 
       vTaskDelayUntil(&lastWakeTime, pdMS_TO_TICKS(15));
   }
