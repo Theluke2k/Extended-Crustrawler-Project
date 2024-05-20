@@ -51,6 +51,7 @@ bool trajectoryReadyFlag = 0;
 bool firstStartup = 1;
 extern bool validInput;
 uint32_t motorTimeout = 3;
+bool timeoutFlag1 = false;
 double MX_28_Constants[4] = { 211.7, 427.4, 642.0, 115.3 };
 double MX_64_Constants[4] = { 80.9, 152.7, 224.5, 105.3 };
 double MX_106_Constants[4] = { 40.4, 83.9, 127.5, 160.6 };
@@ -270,10 +271,10 @@ void ReadMotorState(Motor* M[6]) {
 
   // Check if we received something from all motors
   if (recv_cnt > 0) {
-
   } else {
     Serial.print("[fastSyncRead] Fail, Lib error code: ");
     Serial.println(dxl.getLastLibErrCode());
+    timeoutFlag1 = true;
     return;
   }
   // Special sensitivity on first startup to avoid invalid readings.
@@ -438,7 +439,7 @@ void updateMotorInput(BLA::Matrix<6> tau, BLA::Matrix<6> g) {
 
   // Write the data to the motors using syncWrite
   xSemaphoreTake(motorComms, 1000);
-  sucFlag = dxl.syncWrite(&sw_infos_pwm);
+  timeoutFlag1 = !dxl.syncWrite(&sw_infos_pwm);
   xSemaphoreGive(motorComms);
 }
 
@@ -554,7 +555,7 @@ void ControlTask(void* pvParameters) {
   //double z_n[6] = { 0.4, 0.25, 0.3, 1, 0.3, 1 };  // damping ratio of system
 
   // Controller parameters: Brugt til simple movement test (PWM)
-  double w_n[6] = { 12, 15, 15, 25, 15, 40 };     // natural frequency of system
+  double w_n[6] = { 12, 15, 15, 25, 15, 40 };    // natural frequency of system
   double z_n[6] = { 0.4, 0.3, 0.3, 1, 0.3, 1 };  // damping ratio of system
 
   // General Variables
@@ -619,7 +620,7 @@ void ControlTask(void* pvParameters) {
   const char* gamma = "\xCE\xB3";
 
   while (1) {
-
+    timeoutFlag1 = false;
     duration = micros();
     // Read current position and velocity of motors
     ReadMotorState(M);
@@ -628,7 +629,7 @@ void ControlTask(void* pvParameters) {
     q = getCurrentPositionVector(M);
     qd = getCurrentVelocityVector(M);
 
-    if (inMotionFlag) {
+    if (inMotionFlag && timeoutFlag1 == false) {
 
       // Define some structs for computational optimization
       q_op = { q(0), q(1), q(2), q(3), q(4), q(5) };
@@ -686,8 +687,49 @@ void ControlTask(void* pvParameters) {
 
       // Update the motor input depending on the operating mode
       updateMotorInput(tau, g);
-    }
   /*
+      snprintf(buffer, sizeof(buffer), "%lu,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f",
+               millis(),
+               q_d(0),
+               q_d(1),
+               q_d(2),
+               q_d(3),
+               q_d(4),
+               q_d(5),
+               M1.state.q,
+               M2.state.q,
+               M3.state.q,
+               M4.state.q,
+               M5.state.q,
+               M6.state.q,
+               qd_d(0),
+               qd_d(1),
+               qd_d(2),
+               qd_d(3),
+               qd_d(4),
+               qd_d(5),
+               M1.state.qd,
+               M2.state.qd,
+               M3.state.qd,
+               M4.state.qd,
+               M5.state.qd,
+               M6.state.qd,
+               tau(0),
+               tau(1),
+               tau(2),
+               tau(3),
+               tau(4),
+               tau(5),
+               M1.input,
+               M2.input,
+               M3.input,
+               M4.input,
+               M5.input,
+               M6.input);
+      Serial.println(buffer);
+      */
+    }
+    
     // Caluclate EE pose in operational space
     pos = getEEPosition(q);
     ori = getEEOrientation(q);
@@ -704,8 +746,8 @@ void ControlTask(void* pvParameters) {
              oriEuler(0),
              oriEuler(1),
              oriEuler(2));
-  */
-    //Serial.println(buffer);
+  
+    Serial.println(buffer);
 
     //Serial.println(micros() - duration);
     // Task period
