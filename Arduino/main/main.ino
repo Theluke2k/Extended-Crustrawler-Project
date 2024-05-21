@@ -554,7 +554,7 @@ void ControlTask(void* pvParameters) {
   //double w_n[6] = { 15, 12, 20, 25, 23, 40 };     // natural frequency of system
   //double z_n[6] = { 0.4, 0.25, 0.3, 1, 0.3, 1 };  // damping ratio of system
 
-  // Controller parameters: Brugt til trajectory test
+  // Controller parameters: Brugt til alle PWM tests
   double w_n[6] = { 12, 15, 15, 25, 15, 40 };    // natural frequency of system
   double z_n[6] = { 0.4, 0.3, 0.3, 1, 0.3, 1 };  // damping ratio of system
 
